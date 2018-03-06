@@ -7,10 +7,10 @@ import java.util.*;
 
 public class A_Star implements Searcher {
 
-    public static final int DIAGONAL_COST = 14;
-    public static final int ORTHOGONAL_COST = 10;
-    public static final int HEURISTIC_MULTIPLIER = 14;
-    public final int DELAY = 5;
+    private static final int DIAGONAL_COST = 14;
+    private static final int ORTHOGONAL_COST = 10;
+    private static final int HEURISTIC_MULTIPLIER = 12;
+    private int delay;
     private PriorityQueue<Node> openSet;
     private Set<Node> closedSet;
 
@@ -19,11 +19,13 @@ public class A_Star implements Searcher {
         closedSet = new HashSet<>();
     }
 
-    //current node is start node add to closed set
-    //add current node neighbors to openset with h,g,f costs
-    //search nodes in openset for smallest fCost, if tie, use hCost, if another tie, random select
-    //new node is current node and is added to closedset
-    //new neighbors added to openset.
+    /**
+     * Current node is start node add to closed set.
+     * add current node neighbors to openset with h,g,f costs
+     * search nodes in openset for smallest fCost, if tie, use hCost, if another tie, random select
+     * new node is current node and is added to closedset
+     * new neighbors added to openset.
+     */
     @Override
     public void search(Node[][] world, Point start, Point end) {
         Node startNode = world[start.getX()][start.getY()];
@@ -47,15 +49,22 @@ public class A_Star implements Searcher {
             drawPath(path);
         }
 
+        openSet.clear();
+        closedSet.clear();
     }
 
-    public void drawPath(ArrayList<Node> path) {
+    @Override
+    public void setDelay(int delay) {
+        this.delay = delay;
+    }
+
+    private void drawPath(ArrayList<Node> path) {
         for (Node node : path) {
             node.setFill(Color.LIGHTGREEN);
         }
     }
 
-    public ArrayList<Node> getPath(Node start, Node end) {
+    private ArrayList<Node> getPath(Node start, Node end) {
         Node parent = end.getParentNode();
         ArrayList<Node> path = new ArrayList<>();
         path.add(end);
@@ -67,8 +76,7 @@ public class A_Star implements Searcher {
         return path;
     }
 
-    //TODO add costs to nodes
-    public List<Node> getOpenNeighbors(Node[][] world, Node currentNode, Point end) {
+    private List<Node> getOpenNeighbors(Node[][] world, Node currentNode, Point end) {
         List<Node> neighbors = new ArrayList<>();
         Point p = currentNode.getPointCoordinate();
         currentNode.setFill(Color.RED);
@@ -82,7 +90,6 @@ public class A_Star implements Searcher {
                     continue;
                 }
 
-                //TODO check for diagonal and add costs to neighbor. orthogonal = 10, diagonal = 14
                 int neighborX = x + xOffset;
                 int neighborY = y + yOffset;
 
@@ -109,9 +116,9 @@ public class A_Star implements Searcher {
                         neighbor.sethCost(calculateHCost(neighborX, neighborY, end, HEURISTIC_MULTIPLIER));
                         neighbor.calculateFCost();
                         neighbors.add(neighbor);
-                        neighbor.setFill(Color.MEDIUMPURPLE);
+                        neighbor.setFill(Color.RED);
                         try {
-                            Thread.sleep(DELAY);
+                            Thread.sleep(delay);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -121,6 +128,9 @@ public class A_Star implements Searcher {
             }
         }
         currentNode.setFill(Color.MEDIUMPURPLE);
+        for (Node neighbor : neighbors) {
+            neighbor.setFill(Color.MEDIUMPURPLE);
+        }
         return neighbors;
     }
 
@@ -130,15 +140,15 @@ public class A_Star implements Searcher {
         return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2)) * HEURISTIC_MULTIPLIER;
     }
 
-    public int calculateMovementCost(int xOffset, int yOffset) {
+    private int calculateMovementCost(int xOffset, int yOffset) {
         return isDiagonalNeighbor(xOffset, yOffset) ? DIAGONAL_COST : ORTHOGONAL_COST;
     }
 
-    public boolean isDiagonalNeighbor(int xOffset, int yOffset) {
+    private boolean isDiagonalNeighbor(int xOffset, int yOffset) {
         return Math.abs(xOffset) + Math.abs(yOffset) == 2;
     }
 
-    public boolean isOnMap(int x, int y, int height, int width) {
+    private boolean isOnMap(int x, int y, int height, int width) {
         return x >= 0 && y >= 0 && x < height && y < width;
     }
 

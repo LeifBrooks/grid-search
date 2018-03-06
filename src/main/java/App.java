@@ -14,15 +14,15 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        UiController controller = new UiController();
-        UI view = new UI(controller);
-        Parent p = view.createContent();
-        Scene scene = new Scene(p);
-        controller.setView(view);
-        controller.addListener();
+        UI view = new UI();
+        Parent parent = view.createContent();
+        UiController controller = new UiController(view);
+
+
+        Scene scene = new Scene(parent);
         primaryStage.setTitle("A*");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-    
+
 }

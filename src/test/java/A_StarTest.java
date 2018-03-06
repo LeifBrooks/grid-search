@@ -6,7 +6,7 @@ import org.junit.Test;
 public class A_StarTest {
 
     @Test
-    public void hCostCalulate() {
+    public void hCostCalculate() {
         int x1 = 1;
         int y1 = 1;
         Point p = new Point(5, 5);

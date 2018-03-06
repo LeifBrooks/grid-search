@@ -113,4 +113,9 @@ public class Node extends Rectangle implements Comparable {
     public String toString() {
         return "x: " + this.coordinate.getX() + ", y:" + this.coordinate.getY();
     }
+
+    public void setOpen(boolean open) {
+        this.open = open;
+        setFill(open ? Color.WHITE : Color.NAVY);
+    }
 }
