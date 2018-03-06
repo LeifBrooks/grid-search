@@ -1,3 +1,5 @@
+package models;
+
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
@@ -5,20 +7,20 @@ public class Node extends Rectangle implements Comparable {
 
     private boolean open;
     private Point coordinate;
-    private int gCost; //cost from start Node to this Node.
-    private double hCost; //cost from this Node to End Node.
+    private int gCost; //cost from start models.Node to this models.Node.
+    private double hCost; //cost from this models.Node to End models.Node.
     private double fCost; //Sum of gCost and hCost
     private Node parent;
 
-    public Node(int x, int y, boolean open) {
-        setWidth(App.TILE_SIZE);
-        setHeight(App.TILE_SIZE);
+    public Node(int x, int y, int tileSize, boolean open) {
+        setWidth(tileSize);
+        setHeight(tileSize);
         this.open = open;
         this.coordinate = new Point(x, y);
         setFill(open ? Color.WHITE : Color.NAVY);
         setStroke(Color.BLACK);
 
-        relocate(x * App.TILE_SIZE, y * App.TILE_SIZE);
+        relocate(x * tileSize, y * tileSize);
     }
 
     @Override

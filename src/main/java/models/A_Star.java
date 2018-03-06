@@ -1,3 +1,6 @@
+package models;
+
+import controllers.Searcher;
 import javafx.scene.paint.Color;
 
 import java.util.*;
@@ -6,7 +9,7 @@ public class A_Star implements Searcher {
 
     public static final int DIAGONAL_COST = 14;
     public static final int ORTHOGONAL_COST = 10;
-    public static final int HEURISTIC_MULTIPLIER = 11;
+    public static final int HEURISTIC_MULTIPLIER = 14;
     public final int DELAY = 5;
     private PriorityQueue<Node> openSet;
     private Set<Node> closedSet;
@@ -48,7 +51,7 @@ public class A_Star implements Searcher {
 
     public void drawPath(ArrayList<Node> path) {
         for (Node node : path) {
-            node.setFill(Color.CHARTREUSE);
+            node.setFill(Color.LIGHTGREEN);
         }
     }
 
@@ -97,13 +100,13 @@ public class A_Star implements Searcher {
                         if (gCost < neighbor.getgCost()) {
                             neighbor.setParent(currentNode);
                             neighbor.setgCost(gCost);
-                            neighbor.sethCost(calculateHCost(neighborX, neighborY, end));
+                            neighbor.sethCost(calculateHCost(neighborX, neighborY, end, HEURISTIC_MULTIPLIER));
                             neighbor.calculateFCost();
                         }
                     } else {
                         neighbor.setParent(currentNode);
                         neighbor.setgCost(gCost);
-                        neighbor.sethCost(calculateHCost(neighborX, neighborY, end));
+                        neighbor.sethCost(calculateHCost(neighborX, neighborY, end, HEURISTIC_MULTIPLIER));
                         neighbor.calculateFCost();
                         neighbors.add(neighbor);
                         neighbor.setFill(Color.MEDIUMPURPLE);
@@ -117,11 +120,11 @@ public class A_Star implements Searcher {
                 }
             }
         }
-        currentNode.setFill(Color.PURPLE);
+        currentNode.setFill(Color.MEDIUMPURPLE);
         return neighbors;
     }
 
-    public double calculateHCost(int x1, int y1, Point end) {
+    public double calculateHCost(int x1, int y1, Point end, int HEURISTIC_MULTIPLIER) {
         int x2 = end.getX();
         int y2 = end.getY();
         return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2)) * HEURISTIC_MULTIPLIER;
