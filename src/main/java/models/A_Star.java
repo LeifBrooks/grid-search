@@ -1,16 +1,15 @@
 package models;
 
-import controllers.Searcher;
+import controllers.SearchAlgorithm;
 import javafx.scene.paint.Color;
 
 import java.util.*;
 
-public class A_Star implements Searcher {
+public class A_Star extends SearchAlgorithm {
 
     private static final int DIAGONAL_COST = 14;
     private static final int ORTHOGONAL_COST = 10;
-    private static final int HEURISTIC_MULTIPLIER = 12;
-    private int delay;
+    private static final int HEURISTIC_MULTIPLIER = 15;
     private PriorityQueue<Node> openSet;
     private Set<Node> closedSet;
 
@@ -36,7 +35,7 @@ public class A_Star implements Searcher {
         while (!goalFound && !searchExhausted) {
 
             closedSet.add(currentNode);
-            openSet.addAll(getOpenNeighbors(world, currentNode, end));
+            openSet.addAll(expandNeighbors(world, currentNode, end));
 
             goalFound = openSet.contains(endNode);
             searchExhausted = openSet.isEmpty();
@@ -45,7 +44,7 @@ public class A_Star implements Searcher {
         }
 
         if (goalFound) {
-            ArrayList<Node> path = getPath(startNode, endNode);
+            ArrayList<Node> path = getPath(endNode);
             drawPath(path);
         }
 
@@ -53,36 +52,19 @@ public class A_Star implements Searcher {
         closedSet.clear();
     }
 
-    @Override
-    public void setDelay(int delay) {
-        this.delay = delay;
-    }
+    private List<Node> expandNeighbors(Node[][] world, Node currentNode, Point endPoint) {
 
-    private void drawPath(ArrayList<Node> path) {
-        for (Node node : path) {
-            node.setFill(Color.LIGHTGREEN);
-        }
-    }
-
-    private ArrayList<Node> getPath(Node start, Node end) {
-        Node parent = end.getParentNode();
-        ArrayList<Node> path = new ArrayList<>();
-        path.add(end);
-        while (parent != null) {
-            path.add(parent);
-            parent = parent.getParentNode();
-        }
-        Collections.reverse(path);
-        return path;
-    }
-
-    private List<Node> getOpenNeighbors(Node[][] world, Node currentNode, Point end) {
         List<Node> neighbors = new ArrayList<>();
         Point p = currentNode.getPointCoordinate();
+
         currentNode.setFill(Color.RED);
+
         int x = p.getX();
         int y = p.getY();
 
+        //offset is used to get all neighbor nodes relative to the currentNode
+        //ie: up, down, left, right, diagonals.
+        //this is used to determine the movement cost from currentNode to neighbor
         for (int xOffset = -1; xOffset <= 1; xOffset++) {
             for (int yOffset = -1; yOffset <= 1; yOffset++) {
                 // Do not add current node
@@ -102,21 +84,24 @@ public class A_Star implements Searcher {
                 if (neighbor.isOpen() && !closedSet.contains(neighbor)) {
                     int parentGCost = currentNode.getgCost();
                     int gCost = parentGCost + calculateMovementCost(xOffset, yOffset);
+                    //update costs/parent if its cheaper to get to neighbor via currentNode
                     if (openSet.contains(neighbor)) {
-                        //UPDATE COSTS
                         if (gCost < neighbor.getgCost()) {
                             neighbor.setParent(currentNode);
                             neighbor.setgCost(gCost);
-                            neighbor.sethCost(calculateHCost(neighborX, neighborY, end, HEURISTIC_MULTIPLIER));
+                            neighbor.sethCost(calculateHCost(neighborX, neighborY, endPoint, HEURISTIC_MULTIPLIER));
                             neighbor.calculateFCost();
                         }
                     } else {
                         neighbor.setParent(currentNode);
                         neighbor.setgCost(gCost);
-                        neighbor.sethCost(calculateHCost(neighborX, neighborY, end, HEURISTIC_MULTIPLIER));
+                        neighbor.sethCost(calculateHCost(neighborX, neighborY, endPoint, HEURISTIC_MULTIPLIER));
                         neighbor.calculateFCost();
                         neighbors.add(neighbor);
+
                         neighbor.setFill(Color.RED);
+
+
                         try {
                             Thread.sleep(delay);
                         } catch (InterruptedException e) {
@@ -127,17 +112,25 @@ public class A_Star implements Searcher {
                 }
             }
         }
+
         currentNode.setFill(Color.MEDIUMPURPLE);
+
+
         for (Node neighbor : neighbors) {
+
             neighbor.setFill(Color.MEDIUMPURPLE);
+
+
         }
         return neighbors;
     }
 
     public double calculateHCost(int x1, int y1, Point end, int HEURISTIC_MULTIPLIER) {
-        int x2 = end.getX();
-        int y2 = end.getY();
-        return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2)) * HEURISTIC_MULTIPLIER;
+        return calculateEuclideanDistance(x1, y1, end.getX(), end.getY()) * HEURISTIC_MULTIPLIER;
+    }
+
+    private double calculateEuclideanDistance(int x1, int y1, int x2, int y2) {
+        return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
     }
 
     private int calculateMovementCost(int xOffset, int yOffset) {
@@ -152,4 +145,21 @@ public class A_Star implements Searcher {
         return x >= 0 && y >= 0 && x < height && y < width;
     }
 
+    private void drawPath(ArrayList<Node> path) {
+        for (Node node : path) {
+            node.setFill(Color.LIGHTGREEN);
+        }
+    }
+
+    private ArrayList<Node> getPath(Node end) {
+        Node parent = end.getParentNode();
+        ArrayList<Node> path = new ArrayList<>();
+        path.add(end);
+        while (parent != null) {
+            path.add(parent);
+            parent = parent.getParentNode();
+        }
+        Collections.reverse(path);
+        return path;
+    }
 }

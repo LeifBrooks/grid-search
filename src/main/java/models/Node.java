@@ -7,8 +7,8 @@ public class Node extends Rectangle implements Comparable {
 
     private boolean open;
     private Point coordinate;
-    private int gCost; //cost from start models.Node to this models.Node.
-    private double hCost; //cost from this models.Node to End models.Node.
+    private int gCost; //cost from start Node to this Node.
+    private double hCost; //cost from this Node to End Node.
     private double fCost; //Sum of gCost and hCost
     private Node parent;
 
@@ -34,13 +34,7 @@ public class Node extends Rectangle implements Comparable {
         sethCost(0);
         setfCost(0);
         setParent(null);
-        resetNodeColor();
-    }
-
-    public void resetNodeColor() {
-        if (open) {
-            setFill(Color.WHITE);
-        }
+        setFill(open ? Color.WHITE : Color.NAVY);
     }
 
     public boolean isOpen() {
@@ -118,4 +112,13 @@ public class Node extends Rectangle implements Comparable {
         this.open = open;
         setFill(open ? Color.WHITE : Color.NAVY);
     }
+
+/*    public void updateColor(Color color) {
+        Platform.runLater(() -> {
+            try {
+                this.setFill(color);
+            } finally {
+            }
+        });
+    }*/
 }

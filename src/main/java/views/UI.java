@@ -8,52 +8,74 @@ import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import models.Node;
 
 import java.util.Random;
 
 public class UI {
 
-    public final int TILE_SIZE = 7;
-    public final int HEIGHT = 100;
-    public final int WIDTH = 100;
+    private final int BORDER_PANE_WIDTH = 700;
+    private final int BORDER_PANE_HEIGHT = 800;
+    private final int BOTTOM_BORDER_HEIGHT = 50;
+    private final int TILE_SIZE = 7;
+    private final int HEIGHT = 100;
+    private final int WIDTH = 100;
     private int percentageBlocked = 40;
-    
+
+    private BorderPane borderPane;
     private GridPane grid;
     private Node[][] world;
     private ComboBox algorithmPicker;
     private Slider blockedSlider;
-    private Label blockedSliderLabel;
+    private Label blockedSliderValueLabel;
     private Slider delaySlider;
-    private Label delaySliderLabel;
+    private Label delaySliderValueLabel;
 
 
-    public Parent createContent() {
+    public UI() {
+        createContent();
+    }
+
+    public void createContent() {
         world = createWorld();
         grid = createGrid();
 
+
         HBox bottom = new HBox();
+
+        VBox algorithmPickerBox = new VBox();
+        Label algorithmPickerLabel = new Label("Algorithms");
         algorithmPicker = createAlgorithmPicker();
+        algorithmPickerBox.getChildren().addAll(algorithmPickerLabel, algorithmPicker);
 
+        VBox blockedSliderBox = new VBox();
+        Label blockedSliderLabel = new Label("Percentage Blocked");
         blockedSlider = createBlockedSlider();
-        blockedSliderLabel = new Label(Double.toString(blockedSlider.getValue()));
+        blockedSliderBox.getChildren().addAll(blockedSliderLabel, blockedSlider);
+        blockedSliderValueLabel = new Label(Double.toString(blockedSlider.getValue()));
 
+        VBox delaySliderLabelBox = new VBox();
+        Label delaySliderLabel = new Label("Delay");
         delaySlider = createDelaySlider();
-        delaySliderLabel = new Label(Double.toString(delaySlider.getValue()));
+        delaySliderLabelBox.getChildren().addAll(delaySliderLabel, delaySlider);
 
-        bottom.getChildren().addAll(algorithmPicker, blockedSlider, blockedSliderLabel, delaySlider, delaySliderLabel);
-        bottom.setPrefSize(700, 50);
+        delaySliderValueLabel = new Label(Double.toString(delaySlider.getValue()));
 
-        BorderPane bp = new BorderPane();
-        bp.setCenter(grid);
-        bp.setBottom(bottom);
-        bp.setPrefSize(700, 800);
+        bottom.getChildren().addAll(algorithmPickerBox, blockedSliderBox, blockedSliderValueLabel, delaySliderLabelBox, delaySliderValueLabel);
+        bottom.setPrefSize(BORDER_PANE_WIDTH, BOTTOM_BORDER_HEIGHT);
 
-
-        return bp;
+        borderPane = new BorderPane();
+        borderPane.setCenter(grid);
+        borderPane.setBottom(bottom);
+        borderPane.setPrefSize(BORDER_PANE_WIDTH, BORDER_PANE_HEIGHT);
     }
 
-    public GridPane createGrid() {
+    public Parent getContent() {
+        return borderPane;
+    }
+
+    private GridPane createGrid() {
         GridPane grid = new GridPane();
         grid.setPrefSize(TILE_SIZE * WIDTH, TILE_SIZE * HEIGHT);
         Group tileGroup = new Group();
@@ -66,15 +88,19 @@ public class UI {
         return grid;
     }
 
-    public Node[][] createWorld() {
-        Node[][] world = initWorld();
+    private Node[][] createWorld() {
+        Node[][] world = new Node[HEIGHT][WIDTH];
         for (int x = 0; x < HEIGHT; x++) {
             for (int y = 0; y < WIDTH; y++) {
-                Node node = new Node(x, y, TILE_SIZE, determineIfBlocked());
-                world[x][y] = node;
+                world[x][y] = new Node(x, y, TILE_SIZE, randomlyBlock());
             }
         }
         return world;
+    }
+
+    public boolean randomlyBlock() {
+        Random rand = new Random();
+        return rand.nextInt(100) + 1 > percentageBlocked;
     }
 
     private ComboBox createAlgorithmPicker() {
@@ -83,14 +109,13 @@ public class UI {
                 "A*"
         );
         algorithmPicker.getSelectionModel().selectFirst();
-        algorithmPicker.setPromptText("Algorithm");
         return algorithmPicker;
     }
 
     private Slider createBlockedSlider() {
         Slider blockedSlider = new Slider();
-        blockedSlider.setMin(1);
-        blockedSlider.setMax(99);
+        blockedSlider.setMin(0);
+        blockedSlider.setMax(100);
         this.percentageBlocked = 40;
         blockedSlider.setValue(percentageBlocked);
         blockedSlider.setShowTickLabels(true);
@@ -105,28 +130,13 @@ public class UI {
         Slider delaySlider = new Slider();
         delaySlider.setMin(0);
         delaySlider.setMax(100);
-        delaySlider.setValue(15);
+        delaySlider.setValue(5);
         delaySlider.setShowTickLabels(true);
         delaySlider.setShowTickMarks(true);
         delaySlider.setMajorTickUnit(50);
         delaySlider.setMinorTickCount(5);
         delaySlider.setBlockIncrement(1);
         return delaySlider;
-    }
-
-    private Node[][] initWorld() {
-        Node[][] world = new Node[HEIGHT][WIDTH];
-        for (int i = 0; i < HEIGHT; i++) {
-            for (int j = 0; j < WIDTH; j++) {
-                world[i][j] = new Node(0, 0, TILE_SIZE, false);
-            }
-        }
-        return world;
-    }
-
-    public boolean determineIfBlocked() {
-        Random rand = new Random();
-        return rand.nextInt(100) + 1 > percentageBlocked;
     }
 
     public int getHEIGHT() {
@@ -149,8 +159,8 @@ public class UI {
         return blockedSlider;
     }
 
-    public Label getBlockedSliderLabel() {
-        return blockedSliderLabel;
+    public Label getBlockedSliderValueLabel() {
+        return blockedSliderValueLabel;
     }
 
     public void setPercentageBlocked(int percentageBlocked) {
@@ -161,8 +171,8 @@ public class UI {
         return delaySlider;
     }
 
-    public Label getDelaySliderLabel() {
-        return delaySliderLabel;
+    public Label getDelaySliderValueLabel() {
+        return delaySliderValueLabel;
     }
 
 }

@@ -12,54 +12,64 @@ public class UiController {
     private Node[][] world; //local reference to all of the nodes in the grid
     private Point start;
     private Point end;
-    private Searcher algorithm;
+    private SearchAlgorithm algorithm;
 
     public UiController(UI view) {
+
         this.view = view;
         this.world = view.getWorld();
-        this.algorithm = getAlgorithmFromName((String) view.getAlgorithmPicker().getValue());
+
+        //set default algorithm  from the picker
+        String defaultAlgorithmName = (String) view.getAlgorithmPicker().getValue();
+        this.algorithm = getAlgorithmFromName(defaultAlgorithmName);
+
+        //set default delay speed for algorithm search
+        int defaultDelay = (int) view.getDelaySlider().getValue();
+        algorithm.setDelay(defaultDelay);
+
         addNodeClickHandler();
-        addAlgorithmPickerHandler();
         addBlockedSliderListener();
         addDelaySliderListener();
+        addAlgorithmPickerHandler();
+
     }
 
     private void addNodeClickHandler() {
-        for (Node[] aWorld : world) {
-            for (int j = 0; j < world[0].length; j++) {
-                aWorld[j].setOnMouseClicked(new NodeClickHandler());
+        for (int x = 0; x < world.length; x++) {
+            for (int y = 0; y < this.world[0].length; y++) {
+                world[x][y].setOnMouseClicked(new NodeClickHandler());
             }
         }
+    }
+
+    private void addBlockedSliderListener() {
+        view.getBlockedSlider().valueProperty().addListener((ov, oldVal, newVal) -> {
+            int val = newVal.intValue();
+            view.setPercentageBlocked(val);
+            view.getBlockedSliderValueLabel().setText(val + "");
+            resetBlock();
+        });
+    }
+
+    private void addDelaySliderListener() {
+        view.getDelaySlider().valueProperty().addListener((ov, oldVal, newVal) -> {
+            int val = newVal.intValue();
+            view.getDelaySliderValueLabel().setText(val + "");
+            algorithm.setDelay(val);
+        });
     }
 
     private void addAlgorithmPickerHandler() {
         view.getAlgorithmPicker().setOnAction(event -> {
             String algorithmName = (String) view.getAlgorithmPicker().getValue();
             algorithm = getAlgorithmFromName(algorithmName);
-            algorithm.setDelay(15);
         });
     }
 
-    private Searcher getAlgorithmFromName(String name) {
+    private SearchAlgorithm getAlgorithmFromName(String name) {
         Algorithm algorithmType = Algorithm.stringToAlgorithm(name);
-        return AlgorithmFactory.getAlgorithm(algorithmType);
-    }
+        return AlgorithmFactory.makeAlgorithm(algorithmType);
 
-    private void addBlockedSliderListener() {
-        view.getBlockedSlider().valueProperty().addListener((ov, old_val, new_val) -> {
-            int val = new_val.intValue();
-            view.setPercentageBlocked(val);
-            view.getBlockedSliderLabel().setText(val + "");
-            resetBlock();
-        });
-    }
-
-    private void addDelaySliderListener() {
-        view.getDelaySlider().valueProperty().addListener((ov, old_val, new_val) -> {
-            int val = new_val.intValue();
-            view.getDelaySliderLabel().setText(val + "");
-            algorithm.setDelay(val);
-        });
     }
 
     private void resetWorld() {
@@ -73,13 +83,13 @@ public class UiController {
     private void resetBlock() {
         for (int i = 0; i < view.getHEIGHT(); i++) {
             for (int j = 0; j < view.getWIDTH(); j++) {
-                boolean blocked = view.determineIfBlocked();
+                boolean blocked = view.randomlyBlock();
                 world[i][j].setOpen(blocked);
             }
         }
     }
 
-    private void beginSearch(final Searcher algorithm, final Point START, final Point END) {
+    private void beginSearch(final Point START, final Point END) {
         Runnable task = () -> {
             algorithm.search(world, START, END);
         };
@@ -103,7 +113,7 @@ public class UiController {
                 } else if (end == null) {
                     end = p;
                     world[x][y].select(true);
-                    beginSearch(algorithm, start, end);
+                    beginSearch(start, end);
                 } else {
                     world[start.getX()][start.getY()].select(false);
                     world[end.getX()][end.getY()].select(false);
