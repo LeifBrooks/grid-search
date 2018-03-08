@@ -20,6 +20,10 @@ public enum Algorithm {
         this.type = type;
     }
 
+    public String getType() {
+        return type;
+    }
+
     public static Algorithm stringToAlgorithm(String algorithm) {
         return map.get(algorithm);
     }

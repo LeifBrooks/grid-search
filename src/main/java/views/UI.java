@@ -1,5 +1,8 @@
 package views;
 
+import controllers.Algorithm;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
@@ -9,8 +12,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
 import models.Node;
 
+import java.util.Arrays;
 import java.util.Random;
 
 public class UI {
@@ -105,10 +110,25 @@ public class UI {
 
     private ComboBox createAlgorithmPicker() {
         ComboBox algorithmPicker = new ComboBox();
-        algorithmPicker.getItems().addAll(
-                "A*"
-        );
+        ObservableList<Algorithm> algorithms = FXCollections.observableArrayList();
+
+        Arrays.stream(Algorithm.values()).forEach(algorithms::addAll);
+
+        algorithmPicker.setConverter(new StringConverter<Algorithm>() {
+            @Override
+            public String toString(Algorithm algorithm) {
+                return algorithm.getType();
+            }
+
+            @Override
+            public Algorithm fromString(String type) {
+                return Algorithm.stringToAlgorithm(type);
+            }
+        });
+
+        algorithmPicker.setItems(algorithms);
         algorithmPicker.getSelectionModel().selectFirst();
+
         return algorithmPicker;
     }
 

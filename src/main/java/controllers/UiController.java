@@ -6,6 +6,8 @@ import models.Node;
 import models.Point;
 import views.UI;
 
+import java.util.function.BiConsumer;
+
 public class UiController {
 
     private UI view;
@@ -19,9 +21,9 @@ public class UiController {
         this.view = view;
         this.world = view.getWorld();
 
-        //set default algorithm  from the picker
-        String defaultAlgorithmName = (String) view.getAlgorithmPicker().getValue();
-        this.algorithm = getAlgorithmFromName(defaultAlgorithmName);
+        //set default algorithm from the picker
+        Algorithm defaultAlgorithmType = (Algorithm) view.getAlgorithmPicker().getValue();
+        this.algorithm = AlgorithmFactory.makeAlgorithm(defaultAlgorithmType);
 
         //set default delay speed for algorithm search
         int defaultDelay = (int) view.getDelaySlider().getValue();
@@ -61,30 +63,26 @@ public class UiController {
 
     private void addAlgorithmPickerHandler() {
         view.getAlgorithmPicker().setOnAction(event -> {
-            String algorithmName = (String) view.getAlgorithmPicker().getValue();
-            algorithm = getAlgorithmFromName(algorithmName);
+            Algorithm algorithmType = (Algorithm) view.getAlgorithmPicker().getValue();
+            algorithm = AlgorithmFactory.makeAlgorithm(algorithmType);
         });
     }
 
-    private SearchAlgorithm getAlgorithmFromName(String name) {
-        Algorithm algorithmType = Algorithm.stringToAlgorithm(name);
-        return AlgorithmFactory.makeAlgorithm(algorithmType);
-
-    }
-
     private void resetWorld() {
-        for (int i = 0; i < view.getHEIGHT(); i++) {
-            for (int j = 0; j < view.getWIDTH(); j++) {
-                world[i][j].resetNode();
-            }
-        }
+        loopThroughNodesAndRun((i, j) -> world[i][j].resetNode());
     }
 
     private void resetBlock() {
+        loopThroughNodesAndRun((i, j) -> {
+            boolean blocked = view.randomlyBlock();
+            world[i][j].setOpen(blocked);
+        });
+    }
+
+    private void loopThroughNodesAndRun(BiConsumer<Integer, Integer> action) {
         for (int i = 0; i < view.getHEIGHT(); i++) {
             for (int j = 0; j < view.getWIDTH(); j++) {
-                boolean blocked = view.randomlyBlock();
-                world[i][j].setOpen(blocked);
+                action.accept(i, j);
             }
         }
     }
@@ -126,4 +124,20 @@ public class UiController {
         }
     }
 
+/*    private void resetBlock() {
+        for (int i = 0; i < view.getHEIGHT(); i++) {
+            for (int j = 0; j < view.getWIDTH(); j++) {
+                boolean blocked = view.randomlyBlock();
+                world[i][j].setOpen(blocked);
+            }
+        }
+    }
+
+    private void resetWorld() {
+        for (int i = 0; i < view.getHEIGHT(); i++) {
+            for (int j = 0; j < view.getWIDTH(); j++) {
+                world[i][j].resetNode();
+            }
+        }
+    }*/
 }
