@@ -17,6 +17,7 @@ import models.Node;
 
 import java.util.Arrays;
 import java.util.Random;
+import java.util.function.BiConsumer;
 
 public class UI {
 
@@ -49,25 +50,15 @@ public class UI {
 
         HBox bottom = new HBox();
 
-        VBox algorithmPickerBox = new VBox();
-        Label algorithmPickerLabel = new Label("Algorithms");
-        algorithmPicker = createAlgorithmPicker();
-        algorithmPickerBox.getChildren().addAll(algorithmPickerLabel, algorithmPicker);
+        VBox algorithmPickerBox = createAlgorithmPickerVBox();
 
-        VBox blockedSliderBox = new VBox();
-        Label blockedSliderLabel = new Label("Percentage Blocked");
-        blockedSlider = createBlockedSlider();
-        blockedSliderBox.getChildren().addAll(blockedSliderLabel, blockedSlider);
+        VBox blockedSliderBox = createBlockedSliderVBox();
         blockedSliderValueLabel = new Label(Double.toString(blockedSlider.getValue()));
 
-        VBox delaySliderLabelBox = new VBox();
-        Label delaySliderLabel = new Label("Delay");
-        delaySlider = createDelaySlider();
-        delaySliderLabelBox.getChildren().addAll(delaySliderLabel, delaySlider);
-
+        VBox delaySliderBox = createDelaySliderVBox();
         delaySliderValueLabel = new Label(Double.toString(delaySlider.getValue()));
 
-        bottom.getChildren().addAll(algorithmPickerBox, blockedSliderBox, blockedSliderValueLabel, delaySliderLabelBox, delaySliderValueLabel);
+        bottom.getChildren().addAll(algorithmPickerBox, blockedSliderBox, blockedSliderValueLabel, delaySliderBox, delaySliderValueLabel);
         bottom.setPrefSize(BORDER_PANE_WIDTH, BOTTOM_BORDER_HEIGHT);
 
         borderPane = new BorderPane();
@@ -80,32 +71,40 @@ public class UI {
         return borderPane;
     }
 
+    private Node[][] createWorld() {
+        Node[][] world = new Node[HEIGHT][WIDTH];
+        loopThroughNodesAndRun((i, j) -> world[i][j] = new Node(i, j, TILE_SIZE, randomlyBlock()));
+        return world;
+    }
+
     private GridPane createGrid() {
         GridPane grid = new GridPane();
         grid.setPrefSize(TILE_SIZE * WIDTH, TILE_SIZE * HEIGHT);
         Group tileGroup = new Group();
         grid.getChildren().addAll(tileGroup);
-        for (int x = 0; x < HEIGHT; x++) {
-            for (int y = 0; y < WIDTH; y++) {
-                tileGroup.getChildren().add(world[x][y]);
-            }
-        }
+        loopThroughNodesAndRun((i, j) -> tileGroup.getChildren().add(world[i][j]));
         return grid;
     }
 
-    private Node[][] createWorld() {
-        Node[][] world = new Node[HEIGHT][WIDTH];
-        for (int x = 0; x < HEIGHT; x++) {
-            for (int y = 0; y < WIDTH; y++) {
-                world[x][y] = new Node(x, y, TILE_SIZE, randomlyBlock());
+    public void loopThroughNodesAndRun(BiConsumer<Integer, Integer> action) {
+        for (int i = 0; i < HEIGHT; i++) {
+            for (int j = 0; j < WIDTH; j++) {
+                action.accept(i, j);
             }
         }
-        return world;
     }
 
     public boolean randomlyBlock() {
         Random rand = new Random();
         return rand.nextInt(100) + 1 > percentageBlocked;
+    }
+
+    private VBox createAlgorithmPickerVBox() {
+        VBox algorithmPickerBox = new VBox();
+        Label algorithmPickerLabel = new Label("Algorithms");
+        algorithmPicker = createAlgorithmPicker();
+        algorithmPickerBox.getChildren().addAll(algorithmPickerLabel, algorithmPicker);
+        return algorithmPickerBox;
     }
 
     private ComboBox createAlgorithmPicker() {
@@ -132,6 +131,14 @@ public class UI {
         return algorithmPicker;
     }
 
+    private VBox createBlockedSliderVBox() {
+        VBox blockedSliderBox = new VBox();
+        Label blockedSliderLabel = new Label("Percentage Blocked");
+        blockedSlider = createBlockedSlider();
+        blockedSliderBox.getChildren().addAll(blockedSliderLabel, blockedSlider);
+        return blockedSliderBox;
+    }
+
     private Slider createBlockedSlider() {
         Slider blockedSlider = new Slider();
         blockedSlider.setMin(0);
@@ -146,6 +153,14 @@ public class UI {
         return blockedSlider;
     }
 
+    private VBox createDelaySliderVBox() {
+        VBox delaySliderBox = new VBox();
+        Label delaySliderLabel = new Label("Delay");
+        delaySlider = createDelaySlider();
+        delaySliderBox.getChildren().addAll(delaySliderLabel, delaySlider);
+        return delaySliderBox;
+    }
+
     private Slider createDelaySlider() {
         Slider delaySlider = new Slider();
         delaySlider.setMin(0);
@@ -157,14 +172,6 @@ public class UI {
         delaySlider.setMinorTickCount(5);
         delaySlider.setBlockIncrement(1);
         return delaySlider;
-    }
-
-    public int getHEIGHT() {
-        return HEIGHT;
-    }
-
-    public int getWIDTH() {
-        return WIDTH;
     }
 
     public Node[][] getWorld() {

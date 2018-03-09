@@ -6,15 +6,13 @@ import models.Node;
 import models.Point;
 import views.UI;
 
-import java.util.function.BiConsumer;
-
 public class UiController {
 
     private UI view;
+    private SearchAlgorithm algorithm;
     private Node[][] world; //local reference to all of the nodes in the grid
     private Point start;
     private Point end;
-    private SearchAlgorithm algorithm;
 
     public UiController(UI view) {
 
@@ -37,11 +35,7 @@ public class UiController {
     }
 
     private void addNodeClickHandler() {
-        for (int x = 0; x < world.length; x++) {
-            for (int y = 0; y < this.world[0].length; y++) {
-                world[x][y].setOnMouseClicked(new NodeClickHandler());
-            }
-        }
+        view.loopThroughNodesAndRun((i, j) -> world[i][j].setOnMouseClicked(new NodeClickHandler()));
     }
 
     private void addBlockedSliderListener() {
@@ -69,28 +63,18 @@ public class UiController {
     }
 
     private void resetWorld() {
-        loopThroughNodesAndRun((i, j) -> world[i][j].resetNode());
+        view.loopThroughNodesAndRun((i, j) -> world[i][j].resetNode());
     }
 
     private void resetBlock() {
-        loopThroughNodesAndRun((i, j) -> {
+        view.loopThroughNodesAndRun((i, j) -> {
             boolean blocked = view.randomlyBlock();
             world[i][j].setOpen(blocked);
         });
     }
 
-    private void loopThroughNodesAndRun(BiConsumer<Integer, Integer> action) {
-        for (int i = 0; i < view.getHEIGHT(); i++) {
-            for (int j = 0; j < view.getWIDTH(); j++) {
-                action.accept(i, j);
-            }
-        }
-    }
-
     private void beginSearch(final Point START, final Point END) {
-        Runnable task = () -> {
-            algorithm.search(world, START, END);
-        };
+        Runnable task = () -> algorithm.search(world, START, END);
 
         Thread background = new Thread(task);
         background.setDaemon(true);
@@ -123,21 +107,4 @@ public class UiController {
             }
         }
     }
-
-/*    private void resetBlock() {
-        for (int i = 0; i < view.getHEIGHT(); i++) {
-            for (int j = 0; j < view.getWIDTH(); j++) {
-                boolean blocked = view.randomlyBlock();
-                world[i][j].setOpen(blocked);
-            }
-        }
-    }
-
-    private void resetWorld() {
-        for (int i = 0; i < view.getHEIGHT(); i++) {
-            for (int j = 0; j < view.getWIDTH(); j++) {
-                world[i][j].resetNode();
-            }
-        }
-    }*/
 }
