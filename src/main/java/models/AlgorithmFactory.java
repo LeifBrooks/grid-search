@@ -1,6 +1,4 @@
-package controllers;
-
-import models.A_Star;
+package models;
 
 public class AlgorithmFactory {
 

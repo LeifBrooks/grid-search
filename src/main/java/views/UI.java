@@ -1,6 +1,5 @@
 package views;
 
-import controllers.Algorithm;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
@@ -13,6 +12,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
+import models.Algorithm;
 import models.Node;
 
 import java.util.Arrays;
@@ -43,12 +43,43 @@ public class UI {
         createContent();
     }
 
-    public void createContent() {
+    public Parent getContent() {
+        return borderPane;
+    }
+
+    public Node[][] getWorld() {
+        return world;
+    }
+
+    public ComboBox getAlgorithmPicker() {
+        return algorithmPicker;
+    }
+
+    public Slider getBlockedSlider() {
+        return blockedSlider;
+    }
+
+    public Label getBlockedSliderValueLabel() {
+        return blockedSliderValueLabel;
+    }
+
+    public void setPercentageBlocked(int percentageBlocked) {
+        this.percentageBlocked = percentageBlocked;
+    }
+
+    public Slider getDelaySlider() {
+        return delaySlider;
+    }
+
+    public Label getDelaySliderValueLabel() {
+        return delaySliderValueLabel;
+    }
+
+    private void createContent() {
         world = createWorld();
         grid = createGrid();
 
-
-        HBox bottom = new HBox();
+        HBox bottomContainer = new HBox();
 
         VBox algorithmPickerBox = createAlgorithmPickerVBox();
 
@@ -58,22 +89,18 @@ public class UI {
         VBox delaySliderBox = createDelaySliderVBox();
         delaySliderValueLabel = new Label(Double.toString(delaySlider.getValue()));
 
-        bottom.getChildren().addAll(algorithmPickerBox, blockedSliderBox, blockedSliderValueLabel, delaySliderBox, delaySliderValueLabel);
-        bottom.setPrefSize(BORDER_PANE_WIDTH, BOTTOM_BORDER_HEIGHT);
+        bottomContainer.getChildren().addAll(algorithmPickerBox, blockedSliderBox, blockedSliderValueLabel, delaySliderBox, delaySliderValueLabel);
+        bottomContainer.setPrefSize(BORDER_PANE_WIDTH, BOTTOM_BORDER_HEIGHT);
 
         borderPane = new BorderPane();
         borderPane.setCenter(grid);
-        borderPane.setBottom(bottom);
+        borderPane.setBottom(bottomContainer);
         borderPane.setPrefSize(BORDER_PANE_WIDTH, BORDER_PANE_HEIGHT);
-    }
-
-    public Parent getContent() {
-        return borderPane;
     }
 
     private Node[][] createWorld() {
         Node[][] world = new Node[HEIGHT][WIDTH];
-        loopThroughNodesAndRun((i, j) -> world[i][j] = new Node(i, j, TILE_SIZE, randomlyBlock()));
+        runOnAllNodes((i, j) -> world[i][j] = new Node(i, j, TILE_SIZE, randomlyBlock()));
         return world;
     }
 
@@ -82,14 +109,14 @@ public class UI {
         grid.setPrefSize(TILE_SIZE * WIDTH, TILE_SIZE * HEIGHT);
         Group tileGroup = new Group();
         grid.getChildren().addAll(tileGroup);
-        loopThroughNodesAndRun((i, j) -> tileGroup.getChildren().add(world[i][j]));
+        runOnAllNodes((i, j) -> tileGroup.getChildren().add(world[i][j]));
         return grid;
     }
 
-    public void loopThroughNodesAndRun(BiConsumer<Integer, Integer> action) {
+    public void runOnAllNodes(BiConsumer<Integer, Integer> function) {
         for (int i = 0; i < HEIGHT; i++) {
             for (int j = 0; j < WIDTH; j++) {
-                action.accept(i, j);
+                function.accept(i, j);
             }
         }
     }
@@ -172,34 +199,6 @@ public class UI {
         delaySlider.setMinorTickCount(5);
         delaySlider.setBlockIncrement(1);
         return delaySlider;
-    }
-
-    public Node[][] getWorld() {
-        return world;
-    }
-
-    public ComboBox getAlgorithmPicker() {
-        return algorithmPicker;
-    }
-
-    public Slider getBlockedSlider() {
-        return blockedSlider;
-    }
-
-    public Label getBlockedSliderValueLabel() {
-        return blockedSliderValueLabel;
-    }
-
-    public void setPercentageBlocked(int percentageBlocked) {
-        this.percentageBlocked = percentageBlocked;
-    }
-
-    public Slider getDelaySlider() {
-        return delaySlider;
-    }
-
-    public Label getDelaySliderValueLabel() {
-        return delaySliderValueLabel;
     }
 
 }

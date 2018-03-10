@@ -1,6 +1,5 @@
 package models;
 
-import controllers.SearchAlgorithm;
 import javafx.scene.paint.Color;
 
 import java.util.*;
@@ -10,11 +9,11 @@ public class A_Star extends SearchAlgorithm {
     private static final int DIAGONAL_COST = 14;
     private static final int ORTHOGONAL_COST = 10;
     private static final int HEURISTIC_MULTIPLIER = 15;
-    private PriorityQueue<Node> openSet;
+    private PriorityQueue<Node> frontier;
     private Set<Node> closedSet;
 
     public A_Star() {
-        openSet = new PriorityQueue<>();
+        frontier = new PriorityQueue<>();
         closedSet = new HashSet<>();
     }
 
@@ -35,12 +34,12 @@ public class A_Star extends SearchAlgorithm {
         while (!goalFound && !searchExhausted) {
 
             closedSet.add(currentNode);
-            openSet.addAll(expandNeighbors(world, currentNode, end));
+            frontier.addAll(expandNeighbors(world, currentNode, end));
 
-            goalFound = openSet.contains(endNode);
-            searchExhausted = openSet.isEmpty();
+            goalFound = frontier.contains(endNode);
+            searchExhausted = frontier.isEmpty();
 
-            currentNode = openSet.poll();
+            currentNode = frontier.poll();
         }
 
         if (goalFound) {
@@ -48,7 +47,7 @@ public class A_Star extends SearchAlgorithm {
             drawPath(path);
         }
 
-        openSet.clear();
+        frontier.clear();
         closedSet.clear();
     }
 
@@ -85,23 +84,13 @@ public class A_Star extends SearchAlgorithm {
                     int parentGCost = currentNode.getgCost();
                     int gCost = parentGCost + calculateMovementCost(xOffset, yOffset);
                     //update costs/parent if its cheaper to get to neighbor via currentNode
-                    if (openSet.contains(neighbor)) {
-                        if (gCost < neighbor.getgCost()) {
-                            neighbor.setParent(currentNode);
-                            neighbor.setgCost(gCost);
-                            neighbor.sethCost(calculateHCost(neighborX, neighborY, endPoint, HEURISTIC_MULTIPLIER));
-                            neighbor.calculateFCost();
-                        }
-                    } else {
+                    if (isNeighborUpdatable(neighbor, gCost)) {
                         neighbor.setParent(currentNode);
                         neighbor.setgCost(gCost);
                         neighbor.sethCost(calculateHCost(neighborX, neighborY, endPoint, HEURISTIC_MULTIPLIER));
                         neighbor.calculateFCost();
                         neighbors.add(neighbor);
-
                         neighbor.setFill(Color.RED);
-
-
                         try {
                             Thread.sleep(delay);
                         } catch (InterruptedException e) {
@@ -112,17 +101,13 @@ public class A_Star extends SearchAlgorithm {
                 }
             }
         }
-
         currentNode.setFill(Color.MEDIUMPURPLE);
-
-
-        for (Node neighbor : neighbors) {
-
-            neighbor.setFill(Color.MEDIUMPURPLE);
-
-
-        }
+        neighbors.forEach(neighbor -> neighbor.setFill(Color.MEDIUMPURPLE));
         return neighbors;
+    }
+
+    public boolean isNeighborUpdatable(Node neighbor, int gCost) {
+        return !frontier.contains(neighbor) || gCost < neighbor.getgCost();
     }
 
     public double calculateHCost(int x1, int y1, Point end, int HEURISTIC_MULTIPLIER) {

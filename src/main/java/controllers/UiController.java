@@ -2,8 +2,7 @@ package controllers;
 
 import javafx.event.Event;
 import javafx.event.EventHandler;
-import models.Node;
-import models.Point;
+import models.*;
 import views.UI;
 
 public class UiController {
@@ -27,15 +26,19 @@ public class UiController {
         int defaultDelay = (int) view.getDelaySlider().getValue();
         algorithm.setDelay(defaultDelay);
 
-        addNodeClickHandler();
+        addNodeClickHandlers();
         addBlockedSliderListener();
         addDelaySliderListener();
         addAlgorithmPickerHandler();
 
     }
 
-    private void addNodeClickHandler() {
-        view.loopThroughNodesAndRun((i, j) -> world[i][j].setOnMouseClicked(new NodeClickHandler()));
+    private void addNodeClickHandlers() {
+        view.runOnAllNodes((i, j) -> addNodeClickHandler(world[i][j]));
+    }
+
+    private void addNodeClickHandler(Node node) {
+        node.setOnMouseClicked(new NodeClickHandler());
     }
 
     private void addBlockedSliderListener() {
@@ -63,11 +66,11 @@ public class UiController {
     }
 
     private void resetWorld() {
-        view.loopThroughNodesAndRun((i, j) -> world[i][j].resetNode());
+        view.runOnAllNodes((i, j) -> world[i][j].resetNode());
     }
 
     private void resetBlock() {
-        view.loopThroughNodesAndRun((i, j) -> {
+        view.runOnAllNodes((i, j) -> {
             boolean blocked = view.randomlyBlock();
             world[i][j].setOpen(blocked);
         });
