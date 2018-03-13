@@ -38,7 +38,6 @@ public class UI {
     private Slider delaySlider;
     private Label delaySliderValueLabel;
 
-
     public UI() {
         createContent();
     }
@@ -75,6 +74,18 @@ public class UI {
         return delaySliderValueLabel;
     }
 
+    public void runOnAllNodes(BiConsumer<Integer, Integer> function) {
+        for (int i = 0; i < HEIGHT; i++) {
+            for (int j = 0; j < WIDTH; j++) {
+                function.accept(i, j);
+            }
+        }
+    }
+
+    public boolean randomlyBlock() {
+        return new Random().nextInt(100) + 1 > percentageBlocked;
+    }
+
     private void createContent() {
         world = createWorld();
         grid = createGrid();
@@ -84,10 +95,10 @@ public class UI {
         VBox algorithmPickerBox = createAlgorithmPickerVBox();
 
         VBox blockedSliderBox = createBlockedSliderVBox();
-        blockedSliderValueLabel = new Label(Double.toString(blockedSlider.getValue()));
+        blockedSliderValueLabel = new Label((int) blockedSlider.getValue() + "%");
 
         VBox delaySliderBox = createDelaySliderVBox();
-        delaySliderValueLabel = new Label(Double.toString(delaySlider.getValue()));
+        delaySliderValueLabel = new Label((int) delaySlider.getValue() + "");
 
         bottomContainer.getChildren().addAll(algorithmPickerBox, blockedSliderBox, blockedSliderValueLabel, delaySliderBox, delaySliderValueLabel);
         bottomContainer.setPrefSize(BORDER_PANE_WIDTH, BOTTOM_BORDER_HEIGHT);
@@ -113,19 +124,6 @@ public class UI {
         return grid;
     }
 
-    public void runOnAllNodes(BiConsumer<Integer, Integer> function) {
-        for (int i = 0; i < HEIGHT; i++) {
-            for (int j = 0; j < WIDTH; j++) {
-                function.accept(i, j);
-            }
-        }
-    }
-
-    public boolean randomlyBlock() {
-        Random rand = new Random();
-        return rand.nextInt(100) + 1 > percentageBlocked;
-    }
-
     private VBox createAlgorithmPickerVBox() {
         VBox algorithmPickerBox = new VBox();
         Label algorithmPickerLabel = new Label("Algorithms");
@@ -136,9 +134,10 @@ public class UI {
 
     private ComboBox createAlgorithmPicker() {
         ComboBox algorithmPicker = new ComboBox();
-        ObservableList<Algorithm> algorithms = FXCollections.observableArrayList();
 
+        ObservableList<Algorithm> algorithms = FXCollections.observableArrayList();
         Arrays.stream(Algorithm.values()).forEach(algorithms::addAll);
+        algorithmPicker.setItems(algorithms);
 
         algorithmPicker.setConverter(new StringConverter<Algorithm>() {
             @Override
@@ -152,7 +151,6 @@ public class UI {
             }
         });
 
-        algorithmPicker.setItems(algorithms);
         algorithmPicker.getSelectionModel().selectFirst();
 
         return algorithmPicker;

@@ -41,8 +41,8 @@ public class Node extends Rectangle implements Comparable {
         return open;
     }
 
-    public void select(boolean selected) {
-        setFill(selected ? Color.GOLD : Color.WHITE);
+    public void highlight() {
+        setFill(Color.GOLD);
     }
 
     public Point getPointCoordinate() {
@@ -101,11 +101,6 @@ public class Node extends Rectangle implements Comparable {
         } else {
             return 1;
         }
-    }
-
-    @Override
-    public String toString() {
-        return "x: " + this.coordinate.getX() + ", y:" + this.coordinate.getY();
     }
 
     public void setOpen(boolean open) {

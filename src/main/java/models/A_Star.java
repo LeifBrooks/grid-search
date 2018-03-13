@@ -6,9 +6,9 @@ import java.util.*;
 
 public class A_Star extends SearchAlgorithm {
 
-    private static final int DIAGONAL_COST = 14;
-    private static final int ORTHOGONAL_COST = 10;
-    private static final int HEURISTIC_MULTIPLIER = 15;
+    private final int DIAGONAL_COST = 14;
+    private final int ORTHOGONAL_COST = 10;
+    private double heuristicMultiplier = 12;
     private PriorityQueue<Node> frontier;
     private Set<Node> closedSet;
 
@@ -17,24 +17,15 @@ public class A_Star extends SearchAlgorithm {
         closedSet = new HashSet<>();
     }
 
-    /**
-     * Current node is start node add to closed set.
-     * add current node neighbors to openset with h,g,f costs
-     * search nodes in openset for smallest fCost, if tie, use hCost, if another tie, random select
-     * new node is current node and is added to closedset
-     * new neighbors added to openset.
-     */
     @Override
-    public void search(Node[][] world, Point start, Point end) {
-        Node startNode = world[start.getX()][start.getY()];
+    public void search(Node[][] world, Node startNode, Node endNode) {
         Node currentNode = startNode;
-        Node endNode = world[end.getX()][end.getY()];
         boolean goalFound = startNode.equals(endNode);
         boolean searchExhausted = false;
         while (!goalFound && !searchExhausted) {
 
             closedSet.add(currentNode);
-            frontier.addAll(expandNeighbors(world, currentNode, end));
+            frontier.addAll(expandNeighbors(world, currentNode, endNode));
 
             goalFound = frontier.contains(endNode);
             searchExhausted = frontier.isEmpty();
@@ -51,19 +42,20 @@ public class A_Star extends SearchAlgorithm {
         closedSet.clear();
     }
 
-    private List<Node> expandNeighbors(Node[][] world, Node currentNode, Point endPoint) {
+    private List<Node> expandNeighbors(Node[][] world, Node currentNode, Node endNode) {
 
         List<Node> neighbors = new ArrayList<>();
-        Point p = currentNode.getPointCoordinate();
 
         currentNode.setFill(Color.RED);
 
-        int x = p.getX();
-        int y = p.getY();
+        Point currentPoint = currentNode.getPointCoordinate();
+        int x = currentPoint.getX();
+        int y = currentPoint.getY();
 
         //offset is used to get all neighbor nodes relative to the currentNode
         //ie: up, down, left, right, diagonals.
         //this is used to determine the movement cost from currentNode to neighbor
+
         for (int xOffset = -1; xOffset <= 1; xOffset++) {
             for (int yOffset = -1; yOffset <= 1; yOffset++) {
                 // Do not add current node
@@ -74,30 +66,23 @@ public class A_Star extends SearchAlgorithm {
                 int neighborX = x + xOffset;
                 int neighborY = y + yOffset;
 
-                if (!isOnMap(neighborX, neighborY, world.length, world[0].length)) {
+                if (!isOnMap(neighborX, neighborY, world)) {
                     continue;
                 }
 
                 Node neighbor = world[neighborX][neighborY];
 
-                if (neighbor.isOpen() && !closedSet.contains(neighbor)) {
-                    int parentGCost = currentNode.getgCost();
-                    int gCost = parentGCost + calculateMovementCost(xOffset, yOffset);
-                    //update costs/parent if its cheaper to get to neighbor via currentNode
-                    if (isNeighborUpdatable(neighbor, gCost)) {
-                        neighbor.setParent(currentNode);
-                        neighbor.setgCost(gCost);
-                        neighbor.sethCost(calculateHCost(neighborX, neighborY, endPoint, HEURISTIC_MULTIPLIER));
-                        neighbor.calculateFCost();
-                        neighbors.add(neighbor);
-                        neighbor.setFill(Color.RED);
-                        try {
-                            Thread.sleep(delay);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
+                int gCost = currentNode.getgCost() + calculateMovementCost(xOffset, yOffset);
 
+                if (isNeighborUpdatable(neighbor, gCost)) {
+                    updateNeighbor(neighbor, currentNode, gCost, endNode);
+                    neighbors.add(neighbor);
+                    neighbor.setFill(Color.RED);
+                    try {
+                        Thread.sleep(delay);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -106,12 +91,25 @@ public class A_Star extends SearchAlgorithm {
         return neighbors;
     }
 
-    public boolean isNeighborUpdatable(Node neighbor, int gCost) {
-        return !frontier.contains(neighbor) || gCost < neighbor.getgCost();
+    private boolean isNeighborUpdatable(Node neighbor, int gCost) {
+        return isNeighborExpandable(neighbor) && (!frontier.contains(neighbor) || gCost < neighbor.getgCost());
     }
 
-    public double calculateHCost(int x1, int y1, Point end, int HEURISTIC_MULTIPLIER) {
-        return calculateEuclideanDistance(x1, y1, end.getX(), end.getY()) * HEURISTIC_MULTIPLIER;
+    private boolean isNeighborExpandable(Node neighbor) {
+        return neighbor.isOpen() && !closedSet.contains(neighbor);
+    }
+
+    private void updateNeighbor(Node neighbor, Node currentNode, int gCost, Node endNode) {
+        neighbor.setParent(currentNode);
+        neighbor.setgCost(gCost);
+        neighbor.sethCost(calculateHCost(neighbor.getPointCoordinate().getX(), neighbor.getPointCoordinate().getY(), endNode));
+        neighbor.calculateFCost();
+    }
+
+    public double calculateHCost(int x1, int y1, Node end) {
+        int x2 = end.getPointCoordinate().getX();
+        int y2 = end.getPointCoordinate().getY();
+        return calculateEuclideanDistance(x1, y1, x2, y2) * this.heuristicMultiplier;
     }
 
     private double calculateEuclideanDistance(int x1, int y1, int x2, int y2) {
@@ -126,14 +124,16 @@ public class A_Star extends SearchAlgorithm {
         return Math.abs(xOffset) + Math.abs(yOffset) == 2;
     }
 
-    private boolean isOnMap(int x, int y, int height, int width) {
-        return x >= 0 && y >= 0 && x < height && y < width;
+    private boolean isOnMap(int x, int y, Node[][] world) {
+        return x >= 0 && y >= 0 && x < world.length && y < world[0].length;
     }
 
     private void drawPath(ArrayList<Node> path) {
-        for (Node node : path) {
-            node.setFill(Color.LIGHTGREEN);
-        }
+        path.forEach(node -> node.setFill(Color.LIGHTGREEN));
+    }
+
+    public void setHeuristicMultiplier(double heuristicMultiplier) {
+        this.heuristicMultiplier = heuristicMultiplier;
     }
 
     private ArrayList<Node> getPath(Node end) {

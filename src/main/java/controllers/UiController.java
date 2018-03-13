@@ -2,7 +2,10 @@ package controllers;
 
 import javafx.event.Event;
 import javafx.event.EventHandler;
-import models.*;
+import models.Algorithm;
+import models.AlgorithmFactory;
+import models.Node;
+import models.SearchAlgorithm;
 import views.UI;
 
 public class UiController {
@@ -10,8 +13,8 @@ public class UiController {
     private UI view;
     private SearchAlgorithm algorithm;
     private Node[][] world; //local reference to all of the nodes in the grid
-    private Point start;
-    private Point end;
+    private Node start;
+    private Node end;
 
     public UiController(UI view) {
 
@@ -19,8 +22,7 @@ public class UiController {
         this.world = view.getWorld();
 
         //set default algorithm from the picker
-        Algorithm defaultAlgorithmType = (Algorithm) view.getAlgorithmPicker().getValue();
-        this.algorithm = AlgorithmFactory.makeAlgorithm(defaultAlgorithmType);
+        algorithm = getAlgorithmFromPicker();
 
         //set default delay speed for algorithm search
         int defaultDelay = (int) view.getDelaySlider().getValue();
@@ -45,7 +47,7 @@ public class UiController {
         view.getBlockedSlider().valueProperty().addListener((ov, oldVal, newVal) -> {
             int val = newVal.intValue();
             view.setPercentageBlocked(val);
-            view.getBlockedSliderValueLabel().setText(val + "");
+            view.getBlockedSliderValueLabel().setText(val + "%");
             resetBlock();
         });
     }
@@ -59,10 +61,12 @@ public class UiController {
     }
 
     private void addAlgorithmPickerHandler() {
-        view.getAlgorithmPicker().setOnAction(event -> {
-            Algorithm algorithmType = (Algorithm) view.getAlgorithmPicker().getValue();
-            algorithm = AlgorithmFactory.makeAlgorithm(algorithmType);
-        });
+        view.getAlgorithmPicker().setOnAction(event -> algorithm = getAlgorithmFromPicker());
+    }
+
+    private SearchAlgorithm getAlgorithmFromPicker() {
+        Algorithm algorithmType = (Algorithm) view.getAlgorithmPicker().getValue();
+        return AlgorithmFactory.makeAlgorithm(algorithmType);
     }
 
     private void resetWorld() {
@@ -76,8 +80,8 @@ public class UiController {
         });
     }
 
-    private void beginSearch(final Point START, final Point END) {
-        Runnable task = () -> algorithm.search(world, START, END);
+    private void beginSearch() {
+        Runnable task = () -> algorithm.search(world, start, end);
 
         Thread background = new Thread(task);
         background.setDaemon(true);
@@ -87,25 +91,20 @@ public class UiController {
     private class NodeClickHandler implements EventHandler {
         @Override
         public void handle(Event evt) {
-            Point xy = ((Node) evt.getSource()).getPointCoordinate();
-            int x = xy.getX();
-            int y = xy.getY();
-            Point p = new Point(x, y);
-            if (world[x][y].isOpen()) {
+            Node clickedNode = (Node) evt.getSource();
+            if (clickedNode.isOpen()) {
                 if (start == null) {
-                    start = p;
-                    world[x][y].select(true);
+                    start = clickedNode;
+                    start.highlight();
                 } else if (end == null) {
-                    end = p;
-                    world[x][y].select(true);
-                    beginSearch(start, end);
+                    end = clickedNode;
+                    end.highlight();
+                    beginSearch();
                 } else {
-                    world[start.getX()][start.getY()].select(false);
-                    world[end.getX()][end.getY()].select(false);
-                    start = p;
                     resetWorld();
                     end = null;
-                    world[x][y].select(true);
+                    start = clickedNode;
+                    start.highlight();
                 }
             }
         }

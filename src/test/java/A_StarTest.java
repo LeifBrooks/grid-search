@@ -1,5 +1,5 @@
 import models.A_Star;
-import models.Point;
+import models.Node;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -7,12 +7,10 @@ public class A_StarTest {
 
     @Test
     public void hCostCalculate() {
-        int x1 = 1;
-        int y1 = 1;
-        Point p = new Point(5, 5);
-        int heuristic_modifier = 1;
-
-        Assert.assertEquals(5, (int) new A_Star().calculateHCost(x1, y1, p, heuristic_modifier));
+        Node n = new Node(5, 5, 0, true);
+        A_Star a_star = new A_Star();
+        a_star.setHeuristicMultiplier(1);
+        Assert.assertEquals(5.65, a_star.calculateHCost(1, 1, n), .01);
     }
 
 }
