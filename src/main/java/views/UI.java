@@ -14,6 +14,7 @@ import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import models.Algorithm;
 import models.Node;
+import models.Point;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -40,6 +41,29 @@ public class UI {
 
     public UI() {
         createContent();
+    }
+
+    private void createContent() {
+        world = createWorld();
+        grid = createGrid();
+
+        HBox bottomContainer = new HBox();
+
+        VBox algorithmPickerBox = createAlgorithmPickerVBox();
+
+        VBox blockedSliderBox = createBlockedSliderVBox();
+        blockedSliderValueLabel = new Label((int) blockedSlider.getValue() + "%");
+
+        VBox delaySliderBox = createDelaySliderVBox();
+        delaySliderValueLabel = new Label((int) delaySlider.getValue() + "");
+
+        bottomContainer.getChildren().addAll(algorithmPickerBox, blockedSliderBox, blockedSliderValueLabel, delaySliderBox, delaySliderValueLabel);
+        bottomContainer.setPrefSize(BORDER_PANE_WIDTH, BOTTOM_BORDER_HEIGHT);
+
+        borderPane = new BorderPane();
+        borderPane.setCenter(grid);
+        borderPane.setBottom(bottomContainer);
+        borderPane.setPrefSize(BORDER_PANE_WIDTH, BORDER_PANE_HEIGHT);
     }
 
     public Parent getContent() {
@@ -86,32 +110,9 @@ public class UI {
         return new Random().nextInt(100) + 1 > percentageBlocked;
     }
 
-    private void createContent() {
-        world = createWorld();
-        grid = createGrid();
-
-        HBox bottomContainer = new HBox();
-
-        VBox algorithmPickerBox = createAlgorithmPickerVBox();
-
-        VBox blockedSliderBox = createBlockedSliderVBox();
-        blockedSliderValueLabel = new Label((int) blockedSlider.getValue() + "%");
-
-        VBox delaySliderBox = createDelaySliderVBox();
-        delaySliderValueLabel = new Label((int) delaySlider.getValue() + "");
-
-        bottomContainer.getChildren().addAll(algorithmPickerBox, blockedSliderBox, blockedSliderValueLabel, delaySliderBox, delaySliderValueLabel);
-        bottomContainer.setPrefSize(BORDER_PANE_WIDTH, BOTTOM_BORDER_HEIGHT);
-
-        borderPane = new BorderPane();
-        borderPane.setCenter(grid);
-        borderPane.setBottom(bottomContainer);
-        borderPane.setPrefSize(BORDER_PANE_WIDTH, BORDER_PANE_HEIGHT);
-    }
-
     private Node[][] createWorld() {
         Node[][] world = new Node[HEIGHT][WIDTH];
-        runOnAllNodes((i, j) -> world[i][j] = new Node(i, j, TILE_SIZE, randomlyBlock()));
+        runOnAllNodes((i, j) -> world[i][j] = new Node(new Point(i, j), TILE_SIZE, randomlyBlock()));
         return world;
     }
 

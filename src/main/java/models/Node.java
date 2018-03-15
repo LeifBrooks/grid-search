@@ -12,15 +12,15 @@ public class Node extends Rectangle implements Comparable {
     private double fCost; //Sum of gCost and hCost
     private Node parent;
 
-    public Node(int x, int y, int tileSize, boolean open) {
+    public Node(Point point, int tileSize, boolean open) {
         setWidth(tileSize);
         setHeight(tileSize);
         this.open = open;
-        this.coordinate = new Point(x, y);
+        this.coordinate = point;
         setFill(open ? Color.WHITE : Color.NAVY);
         setStroke(Color.BLACK);
 
-        relocate(x * tileSize, y * tileSize);
+        relocate(point.getX() * tileSize, point.getY() * tileSize);
     }
 
     @Override

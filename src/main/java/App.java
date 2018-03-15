@@ -15,9 +15,9 @@ public class App extends Application {
     public void start(Stage primaryStage) throws Exception {
         UI view = new UI();
         UiController controller = new UiController(view);
-        
+
         Scene scene = new Scene(view.getContent());
-        primaryStage.setTitle("A*");
+        primaryStage.setTitle("Grid Search");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
