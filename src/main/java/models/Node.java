@@ -1,5 +1,6 @@
 package models;
 
+import javafx.application.Platform;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
@@ -108,12 +109,12 @@ public class Node extends Rectangle implements Comparable {
         setFill(open ? Color.WHITE : Color.NAVY);
     }
 
-/*    public void updateColor(Color color) {
+    public void updateColor(Color color) {
         Platform.runLater(() -> {
             try {
                 this.setFill(color);
             } finally {
             }
         });
-    }*/
+    }
 }

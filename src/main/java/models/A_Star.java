@@ -46,7 +46,7 @@ public class A_Star extends SearchAlgorithm {
 
         List<Node> neighbors = new ArrayList<>();
 
-        currentNode.setFill(Color.RED);
+    	currentNode.updateColor(Color.RED);
 
         Point currentPoint = currentNode.getPointCoordinate();
         int x = currentPoint.getX();
@@ -77,7 +77,7 @@ public class A_Star extends SearchAlgorithm {
                 if (isNeighborUpdatable(neighbor, gCost)) {
                     updateNeighbor(neighbor, currentNode, gCost, endNode);
                     neighbors.add(neighbor);
-                    neighbor.setFill(Color.RED);
+                	neighbor.updateColor(Color.RED);
                     try {
                         Thread.sleep(delay);
                     } catch (InterruptedException e) {
@@ -86,8 +86,10 @@ public class A_Star extends SearchAlgorithm {
                 }
             }
         }
-        currentNode.setFill(Color.MEDIUMPURPLE);
-        neighbors.forEach(neighbor -> neighbor.setFill(Color.MEDIUMPURPLE));
+
+        currentNode.updateColor(Color.MEDIUMPURPLE);
+        
+        neighbors.forEach(neighbor -> neighbor.updateColor(Color.MEDIUMPURPLE));
         return neighbors;
     }
 
@@ -129,7 +131,7 @@ public class A_Star extends SearchAlgorithm {
     }
 
     private void drawPath(ArrayList<Node> path) {
-        path.forEach(node -> node.setFill(Color.LIGHTGREEN));
+        path.forEach(node -> node.updateColor(Color.LIGHTGREEN));
     }
 
     public void setHeuristicMultiplier(double heuristicMultiplier) {
