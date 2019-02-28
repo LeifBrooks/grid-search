@@ -18,7 +18,7 @@ import models.Point;
 
 import java.util.Arrays;
 import java.util.Random;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class UI {
 
@@ -98,10 +98,20 @@ public class UI {
         return delaySliderValueLabel;
     }
 
-    public void runOnAllNodes(BiConsumer<Integer, Integer> function) {
+    private Node[][] createWorld() {
+        Node[][] world = new Node[HEIGHT][WIDTH];
         for (int i = 0; i < HEIGHT; i++) {
             for (int j = 0; j < WIDTH; j++) {
-                function.accept(i, j);
+                world[i][j] = new Node(new Point(i, j), TILE_SIZE, randomlyBlock());
+            }
+        }
+        return world;
+    }
+
+    public void runOnAllNodes(Consumer<Node> function) {
+        for (int i = 0; i < HEIGHT; i++) {
+            for (int j = 0; j < WIDTH; j++) {
+                function.accept(world[i][j]);
             }
         }
     }
@@ -110,18 +120,12 @@ public class UI {
         return new Random().nextInt(100) + 1 > percentageBlocked;
     }
 
-    private Node[][] createWorld() {
-        Node[][] world = new Node[HEIGHT][WIDTH];
-        runOnAllNodes((i, j) -> world[i][j] = new Node(new Point(i, j), TILE_SIZE, randomlyBlock()));
-        return world;
-    }
-
     private GridPane createGrid() {
         GridPane grid = new GridPane();
         grid.setPrefSize(TILE_SIZE * WIDTH, TILE_SIZE * HEIGHT);
         Group tileGroup = new Group();
         grid.getChildren().addAll(tileGroup);
-        runOnAllNodes((i, j) -> tileGroup.getChildren().add(world[i][j]));
+        runOnAllNodes(node -> tileGroup.getChildren().add(node));
         return grid;
     }
 

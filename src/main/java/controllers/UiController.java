@@ -36,7 +36,7 @@ public class UiController {
     }
 
     private void addNodeClickHandlers() {
-        view.runOnAllNodes((i, j) -> addNodeClickHandler(world[i][j]));
+        view.runOnAllNodes(this::addNodeClickHandler);
     }
 
     private void addNodeClickHandler(Node node) {
@@ -70,13 +70,13 @@ public class UiController {
     }
 
     private void resetWorld() {
-        view.runOnAllNodes((i, j) -> world[i][j].resetNode());
+        view.runOnAllNodes(Node::resetNode);
     }
 
     private void resetBlock() {
-        view.runOnAllNodes((i, j) -> {
+        view.runOnAllNodes(node -> {
             boolean blocked = view.randomlyBlock();
-            world[i][j].setOpen(blocked);
+            node.setOpen(blocked);
         });
     }
 

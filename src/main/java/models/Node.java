@@ -92,13 +92,7 @@ public class Node extends Rectangle implements Comparable {
         if (this.fCost < other.fCost) {
             return -1;
         } else if (this.fCost == other.fCost) {
-            if (this.hCost < other.hCost) {
-                return -1;
-            } else if (this.hCost == other.hCost) {
-                return 0;
-            } else {
-                return 1;
-            }
+            return Double.compare(this.hCost, other.hCost);
         } else {
             return 1;
         }
