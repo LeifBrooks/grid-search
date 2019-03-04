@@ -4,37 +4,39 @@ import javafx.scene.paint.Color;
 
 import java.util.*;
 
-public class A_Star extends SearchAlgorithm {
+public class AStar extends SearchAlgorithm {
 
     private final int DIAGONAL_COST = 14;
     private final int ORTHOGONAL_COST = 10;
     private double heuristicMultiplier = 12;
-    private PriorityQueue<Node> frontier;
-    private Set<Node> closedSet;
+    private PriorityQueue<AStarNode> frontier;
+    private Set<AStarNode> closedSet;
 
-    public A_Star() {
+    public AStar() {
         frontier = new PriorityQueue<>();
         closedSet = new HashSet<>();
     }
 
     @Override
     public void search(Node[][] world, Node startNode, Node endNode) {
-        Node currentNode = startNode;
-        boolean goalFound = startNode.equals(endNode);
+        AStarNode currentNode = new AStarNode(startNode);
+        AStarNode endNodeWrapper = new AStarNode(endNode);
+        boolean goalFound = currentNode.equals(endNodeWrapper);
         boolean searchExhausted = false;
         while (!goalFound && !searchExhausted) {
 
             closedSet.add(currentNode);
-            frontier.addAll(expandNeighbors(world, currentNode, endNode));
+            frontier.addAll(expandNeighbors(world, currentNode, endNodeWrapper));
 
-            goalFound = frontier.contains(endNode);
+            goalFound = frontier.contains(endNodeWrapper);
             searchExhausted = frontier.isEmpty();
 
             currentNode = frontier.poll();
         }
 
         if (goalFound) {
-            ArrayList<Node> path = getPath(endNode);
+            //currentNode will be the goal
+            ArrayList<AStarNode> path = getPath(currentNode);
             drawPath(path);
         }
 
@@ -42,9 +44,9 @@ public class A_Star extends SearchAlgorithm {
         closedSet.clear();
     }
 
-    private List<Node> expandNeighbors(Node[][] world, Node currentNode, Node endNode) {
+    private List<AStarNode> expandNeighbors(Node[][] world, AStarNode currentNode, AStarNode endNode) {
 
-        List<Node> neighbors = new ArrayList<>();
+        List<AStarNode> neighbors = new ArrayList<>();
 
     	currentNode.updateColor(Color.RED);
 
@@ -70,7 +72,7 @@ public class A_Star extends SearchAlgorithm {
                     continue;
                 }
 
-                Node neighbor = world[neighborX][neighborY];
+                AStarNode neighbor = new AStarNode(world[neighborX][neighborY]);
 
                 int gCost = currentNode.getgCost() + calculateMovementCost(xOffset, yOffset);
 
@@ -93,22 +95,22 @@ public class A_Star extends SearchAlgorithm {
         return neighbors;
     }
 
-    private boolean isNeighborUpdatable(Node neighbor, int gCost) {
+    private boolean isNeighborUpdatable(AStarNode neighbor, int gCost) {
         return isNeighborExpandable(neighbor) && (!frontier.contains(neighbor) || gCost < neighbor.getgCost());
     }
 
-    private boolean isNeighborExpandable(Node neighbor) {
+    private boolean isNeighborExpandable(AStarNode neighbor) {
         return neighbor.isOpen() && !closedSet.contains(neighbor);
     }
 
-    private void updateNeighbor(Node neighbor, Node currentNode, int gCost, Node endNode) {
+    private void updateNeighbor(AStarNode neighbor, AStarNode currentNode, int gCost, AStarNode endNode) {
         neighbor.setParent(currentNode);
         neighbor.setgCost(gCost);
         neighbor.sethCost(calculateHCost(neighbor.getPointCoordinate().getX(), neighbor.getPointCoordinate().getY(), endNode));
         neighbor.calculateFCost();
     }
 
-    public double calculateHCost(int x1, int y1, Node end) {
+    public double calculateHCost(int x1, int y1, AStarNode end) {
         int x2 = end.getPointCoordinate().getX();
         int y2 = end.getPointCoordinate().getY();
         return calculateEuclideanDistance(x1, y1, x2, y2) * this.heuristicMultiplier;
@@ -130,7 +132,7 @@ public class A_Star extends SearchAlgorithm {
         return x >= 0 && y >= 0 && x < world.length && y < world[0].length;
     }
 
-    private void drawPath(ArrayList<Node> path) {
+    private void drawPath(ArrayList<AStarNode> path) {
         path.forEach(node -> node.updateColor(Color.LIGHTGREEN));
     }
 
@@ -138,9 +140,9 @@ public class A_Star extends SearchAlgorithm {
         this.heuristicMultiplier = heuristicMultiplier;
     }
 
-    private ArrayList<Node> getPath(Node end) {
-        Node parent = end.getParentNode();
-        ArrayList<Node> path = new ArrayList<>();
+    private ArrayList<AStarNode> getPath(AStarNode end) {
+        AStarNode parent = end.getParentNode();
+        ArrayList<AStarNode> path = new ArrayList<>();
         path.add(end);
         while (parent != null) {
             path.add(parent);

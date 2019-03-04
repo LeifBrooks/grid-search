@@ -1,4 +1,5 @@
-import models.A_Star;
+import models.AStarNode;
+import models.AStar;
 import models.Node;
 import models.Point;
 import org.junit.Assert;
@@ -6,12 +7,12 @@ import org.junit.Test;
 
 import java.util.PriorityQueue;
 
-public class A_StarTest {
+public class AStarTest {
 
     @Test
     public void hCostCalculate() {
-        Node n = new Node(new Point(5, 5), 0, true);
-        A_Star a_star = new A_Star();
+        AStarNode n = new AStarNode(new Node(new Point(5, 5), 0, true));
+        AStar a_star = new AStar();
         a_star.setHeuristicMultiplier(1);
         Assert.assertEquals(5.65, a_star.calculateHCost(1, 1, n), .01);
     }
@@ -21,9 +22,9 @@ public class A_StarTest {
      * Use fCost to compare
      */
     public void compareToFCost() {
-        Node n1 = new Node(new Point(0, 0), 10, false);
+        AStarNode n1 = new AStarNode(new Node(new Point(0, 0), 10, false));
         n1.setfCost(10);
-        Node n2 = new Node(new Point(1, 0), 10, false);
+        AStarNode n2 = new AStarNode(new Node(new Point(1, 0), 10, false));
 
 
         //less than
@@ -40,10 +41,10 @@ public class A_StarTest {
      * If fCost is Tied, use hCost
      */
     public void compareToFCostTie() {
-        Node n1 = new Node(new Point(0, 0), 10, false);
+        AStarNode n1 = new AStarNode(new Node(new Point(0, 0), 10, false));
         n1.setfCost(10);
         n1.sethCost(5);
-        Node n2 = new Node(new Point(1, 0), 10, false);
+        AStarNode n2 = new AStarNode(new Node(new Point(1, 0), 10, false));
         n2.setfCost(10);
 
         //less than
@@ -64,9 +65,9 @@ public class A_StarTest {
      * PriorityQueue sorts from minimum fCost/hCost to maximum
      */
     public void priorityQueueCostsNotEqual() {
-        PriorityQueue<Node> pq = new PriorityQueue<>();
-        Node n1 = new Node(new Point(0, 0), 10, false);
-        Node n2 = new Node(new Point(1, 0), 10, false);
+        PriorityQueue<AStarNode> pq = new PriorityQueue<>();
+        AStarNode n1 = new AStarNode(new Node(new Point(0, 0), 10, false));
+        AStarNode n2 = new AStarNode(new Node(new Point(1, 0), 10, false));
 
         n1.setfCost(5);
         n2.setfCost(10);
@@ -106,14 +107,14 @@ public class A_StarTest {
 
     @Test
     public void priorityQueueCostsEqual() {
-        PriorityQueue<Node> pq = new PriorityQueue<>();
-        Node n1 = new Node(new Point(0, 0), 10, false);
+        PriorityQueue<AStarNode> pq = new PriorityQueue<>();
+        AStarNode n1 = new AStarNode(new Node(new Point(0, 0), 10, false));
         n1.setfCost(5);
         n1.sethCost(5);
-        Node n2 = new Node(new Point(1, 0), 10, false);
+        AStarNode n2 = new AStarNode(new Node(new Point(1, 0), 10, false));
         n2.setfCost(5);
         n2.sethCost(5);
-        Node n3 = new Node(new Point(1, 1), 10, false);
+        AStarNode n3 = new AStarNode(new Node(new Point(1, 1), 10, false));
         n3.setfCost(10);
         n3.sethCost(10);
 
