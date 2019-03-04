@@ -1,10 +1,11 @@
-package models;
+package models.algorithms;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public enum Algorithm {
-    A_STAR("A*");
+    A_STAR("A*"),
+    DFS("Depth First Search");
 
     private String type;
 

@@ -1,5 +1,5 @@
 import models.AStarNode;
-import models.AStar;
+import models.algorithms.AStar;
 import models.Node;
 import models.Point;
 import org.junit.Assert;

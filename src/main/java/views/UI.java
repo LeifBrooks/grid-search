@@ -12,7 +12,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
-import models.Algorithm;
+import models.algorithms.Algorithm;
 import models.Node;
 import models.Point;
 

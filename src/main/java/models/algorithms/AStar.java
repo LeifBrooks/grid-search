@@ -1,6 +1,9 @@
-package models;
+package models.algorithms;
 
 import javafx.scene.paint.Color;
+import models.AStarNode;
+import models.Node;
+import models.Point;
 
 import java.util.*;
 

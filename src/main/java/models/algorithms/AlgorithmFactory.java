@@ -1,4 +1,4 @@
-package models;
+package models.algorithms;
 
 public class AlgorithmFactory {
 
@@ -6,6 +6,8 @@ public class AlgorithmFactory {
         switch (type) {
             case A_STAR:
                 return new AStar();
+            case DFS:
+                return new DFS();
             default:
                 return null;
         }

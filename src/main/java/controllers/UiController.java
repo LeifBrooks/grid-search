@@ -2,10 +2,10 @@ package controllers;
 
 import javafx.event.Event;
 import javafx.event.EventHandler;
-import models.Algorithm;
-import models.AlgorithmFactory;
+import models.algorithms.Algorithm;
+import models.algorithms.AlgorithmFactory;
 import models.Node;
-import models.SearchAlgorithm;
+import models.algorithms.SearchAlgorithm;
 import views.UI;
 
 public class UiController {

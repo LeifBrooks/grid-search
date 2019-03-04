@@ -1,4 +1,6 @@
-package models;
+package models.algorithms;
+
+import models.Node;
 
 public abstract class SearchAlgorithm {
 
