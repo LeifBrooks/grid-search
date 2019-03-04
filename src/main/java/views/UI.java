@@ -1,7 +1,10 @@
 package views;
 
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
@@ -74,28 +77,28 @@ public class UI {
         return world;
     }
 
-    public ComboBox getAlgorithmPicker() {
-        return algorithmPicker;
+    public Object getAlgorithmPickerValue() { return algorithmPicker.getValue(); }
+
+    public void setAlgorithmPickerOnAction(EventHandler<ActionEvent> event) {
+        algorithmPicker.setOnAction(event);
     }
 
-    public Slider getBlockedSlider() {
-        return blockedSlider;
-    }
+    public void setBlockedSliderValueLabelText(String text) { blockedSliderValueLabel.setText(text); }
 
-    public Label getBlockedSliderValueLabel() {
-        return blockedSliderValueLabel;
+    public void addBlockedSliderListener(ChangeListener<? super Number> listener) {
+        blockedSlider.valueProperty().addListener(listener);
     }
 
     public void setPercentageBlocked(int percentageBlocked) {
         this.percentageBlocked = percentageBlocked;
     }
 
-    public Slider getDelaySlider() {
-        return delaySlider;
-    }
+    public double getDelaySliderValue() { return delaySlider.getValue(); }
 
-    public Label getDelaySliderValueLabel() {
-        return delaySliderValueLabel;
+    public void setDelaySliderValueLabelText(String text) { delaySliderValueLabel.setText(text); }
+
+    public void addDelaySliderListener(ChangeListener<? super Number> listener) {
+        delaySlider.valueProperty().addListener(listener);
     }
 
     private Node[][] createWorld() {
@@ -147,7 +150,7 @@ public class UI {
         algorithmPicker.setConverter(new StringConverter<Algorithm>() {
             @Override
             public String toString(Algorithm algorithm) {
-                return algorithm.getType();
+                return algorithm.getName();
             }
 
             @Override

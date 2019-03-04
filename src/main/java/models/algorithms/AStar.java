@@ -3,7 +3,6 @@ package models.algorithms;
 import javafx.scene.paint.Color;
 import models.AStarNode;
 import models.Node;
-import models.Point;
 
 import java.util.*;
 
@@ -53,9 +52,8 @@ public class AStar extends SearchAlgorithm {
 
     	currentNode.updateColor(Color.RED);
 
-        Point currentPoint = currentNode.getPointCoordinate();
-        int x = currentPoint.getX();
-        int y = currentPoint.getY();
+        int x = currentNode.getX();
+        int y = currentNode.getY();
 
         //offset is used to get all neighbor nodes relative to the currentNode
         //ie: up, down, left, right, diagonals.
@@ -109,13 +107,13 @@ public class AStar extends SearchAlgorithm {
     private void updateNeighbor(AStarNode neighbor, AStarNode currentNode, int gCost, AStarNode endNode) {
         neighbor.setParent(currentNode);
         neighbor.setgCost(gCost);
-        neighbor.sethCost(calculateHCost(neighbor.getPointCoordinate().getX(), neighbor.getPointCoordinate().getY(), endNode));
+        neighbor.sethCost(calculateHCost(neighbor.getX(), neighbor.getY(), endNode));
         neighbor.calculateFCost();
     }
 
     public double calculateHCost(int x1, int y1, AStarNode end) {
-        int x2 = end.getPointCoordinate().getX();
-        int y2 = end.getPointCoordinate().getY();
+        int x2 = end.getX();
+        int y2 = end.getY();
         return calculateEuclideanDistance(x1, y1, x2, y2) * this.heuristicMultiplier;
     }
 

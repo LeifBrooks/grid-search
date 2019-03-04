@@ -38,8 +38,12 @@ public class Node extends Rectangle {
         setFill(Color.GOLD);
     }
 
-    public Point getPointCoordinate() {
-        return this.coordinate;
+    public int getGridX() {
+        return coordinate.getX();
+    }
+
+    public int getGridY() {
+        return coordinate.getY();
     }
 
     public void setOpen(boolean open) {

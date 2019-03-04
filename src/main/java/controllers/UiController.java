@@ -25,7 +25,7 @@ public class UiController {
         algorithm = getAlgorithmFromPicker();
 
         //set default delay speed for algorithm search
-        int defaultDelay = (int) view.getDelaySlider().getValue();
+        int defaultDelay = (int) view.getDelaySliderValue();
         algorithm.setDelay(defaultDelay);
 
         addNodeClickHandlers();
@@ -44,28 +44,28 @@ public class UiController {
     }
 
     private void addBlockedSliderListener() {
-        view.getBlockedSlider().valueProperty().addListener((ov, oldVal, newVal) -> {
+        view.addBlockedSliderListener((ov, oldVal, newVal) -> {
             int val = newVal.intValue();
             view.setPercentageBlocked(val);
-            view.getBlockedSliderValueLabel().setText(val + "%");
+            view.setBlockedSliderValueLabelText(val + "%");
             resetBlock();
         });
     }
 
     private void addDelaySliderListener() {
-        view.getDelaySlider().valueProperty().addListener((ov, oldVal, newVal) -> {
+        view.addDelaySliderListener((ov, oldVal, newVal) -> {
             int val = newVal.intValue();
-            view.getDelaySliderValueLabel().setText(val + "");
+            view.setDelaySliderValueLabelText(val + "");
             algorithm.setDelay(val);
         });
     }
 
     private void addAlgorithmPickerHandler() {
-        view.getAlgorithmPicker().setOnAction(event -> algorithm = getAlgorithmFromPicker());
+        view.setAlgorithmPickerOnAction(event -> algorithm = getAlgorithmFromPicker());
     }
 
     private SearchAlgorithm getAlgorithmFromPicker() {
-        Algorithm algorithmType = (Algorithm) view.getAlgorithmPicker().getValue();
+        Algorithm algorithmType = (Algorithm) view.getAlgorithmPickerValue();
         return AlgorithmFactory.makeAlgorithm(algorithmType);
     }
 

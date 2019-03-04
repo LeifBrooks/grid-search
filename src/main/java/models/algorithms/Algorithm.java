@@ -7,26 +7,26 @@ public enum Algorithm {
     A_STAR("A*"),
     DFS("Depth First Search");
 
-    private String type;
+    private String name;
 
-    private static Map<String, Algorithm> map = new HashMap<>();
+    private static Map<String, Algorithm> algorithms = new HashMap<>();
 
     static {
         for (Algorithm algorithm : Algorithm.values()) {
-            map.put(algorithm.type, algorithm);
+            algorithms.put(algorithm.name, algorithm);
         }
     }
 
-    Algorithm(String type) {
-        this.type = type;
+    Algorithm(String name) {
+        this.name = name;
     }
 
-    public String getType() {
-        return type;
+    public String getName() {
+        return name;
     }
 
     public static Algorithm stringToAlgorithm(String algorithm) {
-        return map.get(algorithm);
+        return algorithms.get(algorithm);
     }
 }
 

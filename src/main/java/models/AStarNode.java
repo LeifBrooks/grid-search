@@ -51,9 +51,9 @@ public class AStarNode implements Comparable {
         this.uiNode.updateColor(color);
     }
 
-    public Point getPointCoordinate() {
-        return this.uiNode.getPointCoordinate();
-    }
+    public int getX() { return this.uiNode.getGridX(); }
+
+    public int getY() { return this.uiNode.getGridY(); }
 
     public boolean isOpen() {
         return this.uiNode.isOpen();
