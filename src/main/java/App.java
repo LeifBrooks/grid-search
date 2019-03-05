@@ -12,7 +12,7 @@ public class App extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         UI view = new UI();
         UiController controller = new UiController(view);
 

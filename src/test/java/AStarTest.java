@@ -9,9 +9,13 @@ import java.util.PriorityQueue;
 
 public class AStarTest {
 
+    private AStarNode buildAStarNode(int x, int y, int tileSize, boolean open) {
+        return new AStarNode(new Node(new Point(x,y),tileSize,open));
+    }
+
     @Test
     public void hCostCalculate() {
-        AStarNode n = new AStarNode(new Node(new Point(5, 5), 0, true));
+        AStarNode n = buildAStarNode(5, 5, 0, true);
         AStar a_star = new AStar();
         a_star.setHeuristicMultiplier(1);
         Assert.assertEquals(5.65, a_star.calculateHCost(1, 1, n), .01);
@@ -22,9 +26,9 @@ public class AStarTest {
      * Use fCost to compare
      */
     public void compareToFCost() {
-        AStarNode n1 = new AStarNode(new Node(new Point(0, 0), 10, false));
+        AStarNode n1 = buildAStarNode(0, 0, 10, false);
         n1.setfCost(10);
-        AStarNode n2 = new AStarNode(new Node(new Point(1, 0), 10, false));
+        AStarNode n2 = buildAStarNode(1, 0, 10, false);
 
 
         //less than
@@ -41,10 +45,10 @@ public class AStarTest {
      * If fCost is Tied, use hCost
      */
     public void compareToFCostTie() {
-        AStarNode n1 = new AStarNode(new Node(new Point(0, 0), 10, false));
+        AStarNode n1 = buildAStarNode(0, 0, 10, false);
         n1.setfCost(10);
         n1.sethCost(5);
-        AStarNode n2 = new AStarNode(new Node(new Point(1, 0), 10, false));
+        AStarNode n2 = buildAStarNode(1, 0, 10, false);
         n2.setfCost(10);
 
         //less than
@@ -66,8 +70,8 @@ public class AStarTest {
      */
     public void priorityQueueCostsNotEqual() {
         PriorityQueue<AStarNode> pq = new PriorityQueue<>();
-        AStarNode n1 = new AStarNode(new Node(new Point(0, 0), 10, false));
-        AStarNode n2 = new AStarNode(new Node(new Point(1, 0), 10, false));
+        AStarNode n1 = buildAStarNode(0, 0, 10, false);
+        AStarNode n2 = buildAStarNode(1, 0, 10, false);
 
         n1.setfCost(5);
         n2.setfCost(10);
@@ -108,13 +112,13 @@ public class AStarTest {
     @Test
     public void priorityQueueCostsEqual() {
         PriorityQueue<AStarNode> pq = new PriorityQueue<>();
-        AStarNode n1 = new AStarNode(new Node(new Point(0, 0), 10, false));
+        AStarNode n1 = buildAStarNode(0, 0, 10, false);
         n1.setfCost(5);
         n1.sethCost(5);
-        AStarNode n2 = new AStarNode(new Node(new Point(1, 0), 10, false));
+        AStarNode n2 = buildAStarNode(1, 0, 10, false);
         n2.setfCost(5);
         n2.sethCost(5);
-        AStarNode n3 = new AStarNode(new Node(new Point(1, 1), 10, false));
+        AStarNode n3 = buildAStarNode(1, 1, 10, false);
         n3.setfCost(10);
         n3.sethCost(10);
 
