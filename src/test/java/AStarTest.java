@@ -5,7 +5,10 @@ import models.Point;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.HashSet;
+import java.util.Objects;
 import java.util.PriorityQueue;
+import java.util.Set;
 
 public class AStarTest {
 
@@ -126,6 +129,22 @@ public class AStarTest {
         pq.add(n2);
         pq.add(n3);
         Assert.assertEquals(5, pq.poll().getfCost(), .001);
+    }
+
+    @Test
+    /**
+     *  Since the AStarNode is just a wrapper for the Node class,
+     *  any two AStarNodes with same reference to a particular Node
+     *  should hash to the the same location. 
+     */
+    public void sameNodeSameHash() {
+        Set<AStarNode> closedSet = new HashSet<>();
+        Node node = new Node(new Point(0,0),0,true);
+        AStarNode a = new AStarNode(node);
+        AStarNode b = new AStarNode(node);
+
+        closedSet.add(a);
+        Assert.assertTrue(closedSet.contains(b));
     }
 
 }
