@@ -81,4 +81,8 @@ public class AStarNode implements Comparable {
         }
     }
 
+    @Override
+    public int hashCode() {
+        return this.uiNode.hashCode();
+    }
 }
