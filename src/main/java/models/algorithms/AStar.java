@@ -48,16 +48,36 @@ public class AStar extends SearchAlgorithm {
 
     private List<AStarNode> expandNeighbors(Node[][] world, AStarNode currentNode, AStarNode endNode) {
 
-        List<AStarNode> neighbors = new ArrayList<>();
-
     	currentNode.updateColor(Color.RED);
 
-        int x = currentNode.getX();
-        int y = currentNode.getY();
+        List<AStarNode>  neighbors = getNeighbors(currentNode, world);
+        Iterator<AStarNode> iter = neighbors.iterator();
 
-        //offset is used to get all neighbor nodes relative to the currentNode
-        //ie: up, down, left, right, diagonals.
-        //this is used to determine the movement cost from currentNode to neighbor
+        while(iter.hasNext()) {
+            AStarNode neighbor = iter.next();
+            int gCost = currentNode.getgCost() + calculateMovementCost(currentNode, neighbor);
+
+            if (isNeighborUpdatable(neighbor, gCost)) {
+                updateNeighbor(neighbor, currentNode, gCost, endNode);
+                neighbor.updateColor(Color.RED);
+                try {
+                    Thread.sleep(delay);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                iter.remove();
+            }
+        }
+
+        currentNode.updateColor(Color.MEDIUMPURPLE);
+        
+        neighbors.forEach(neighbor -> neighbor.updateColor(Color.MEDIUMPURPLE));
+        return neighbors;
+    }
+
+    private List<AStarNode> getNeighbors(AStarNode currentNode, Node[][] world) {
+        ArrayList<AStarNode> neighbors = new ArrayList<>();
 
         for (int xOffset = -1; xOffset <= 1; xOffset++) {
             for (int yOffset = -1; yOffset <= 1; yOffset++) {
@@ -66,33 +86,15 @@ public class AStar extends SearchAlgorithm {
                     continue;
                 }
 
-                int neighborX = x + xOffset;
-                int neighborY = y + yOffset;
+                int neighborX = currentNode.getX() + xOffset;
+                int neighborY =  currentNode.getY() + yOffset;
 
                 if (!isOnMap(neighborX, neighborY, world)) {
                     continue;
                 }
-
-                AStarNode neighbor = new AStarNode(world[neighborX][neighborY]);
-
-                int gCost = currentNode.getgCost() + calculateMovementCost(xOffset, yOffset);
-
-                if (isNeighborUpdatable(neighbor, gCost)) {
-                    updateNeighbor(neighbor, currentNode, gCost, endNode);
-                    neighbors.add(neighbor);
-                	neighbor.updateColor(Color.RED);
-                    try {
-                        Thread.sleep(delay);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
+                neighbors.add(new AStarNode(world[neighborX][neighborY]));
             }
         }
-
-        currentNode.updateColor(Color.MEDIUMPURPLE);
-        
-        neighbors.forEach(neighbor -> neighbor.updateColor(Color.MEDIUMPURPLE));
         return neighbors;
     }
 
@@ -121,12 +123,14 @@ public class AStar extends SearchAlgorithm {
         return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
     }
 
-    private int calculateMovementCost(int xOffset, int yOffset) {
+    private int calculateMovementCost(AStarNode currentNode, AStarNode neighbor) {
+        int xOffset = Math.abs(currentNode.getX() - neighbor.getX());
+        int yOffset = Math.abs(currentNode.getY() - neighbor.getY());
         return isDiagonalNeighbor(xOffset, yOffset) ? DIAGONAL_COST : ORTHOGONAL_COST;
     }
 
     private boolean isDiagonalNeighbor(int xOffset, int yOffset) {
-        return Math.abs(xOffset) + Math.abs(yOffset) == 2;
+        return xOffset + yOffset == 2;
     }
 
     private boolean isOnMap(int x, int y, Node[][] world) {
