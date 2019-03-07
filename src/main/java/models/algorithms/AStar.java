@@ -10,7 +10,7 @@ public class AStar extends SearchAlgorithm {
 
     private final int DIAGONAL_COST = 14;
     private final int ORTHOGONAL_COST = 10;
-    private double heuristicMultiplier = 12;
+    private double heuristicMultiplier = 13;
     private PriorityQueue<AStarNode> frontier;
     private Set<AStarNode> closedSet;
 
