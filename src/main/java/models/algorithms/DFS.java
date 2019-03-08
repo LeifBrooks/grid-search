@@ -8,36 +8,35 @@ import java.util.stream.Collectors;
 
 public class DFS extends SearchAlgorithm {
 
-    Map<Node,List<Node>> adjacency;
-    BitSet visited;
+    private Map<Node,List<Node>> adjacency;
+    private BitSet visited;
+    private Stack<Node> stack;
+
 
     @Override
     public void search(Node[][] world, Node start, Node end) {
+
+        visited = new BitSet(world.length * world[0].length);
+        stack = new Stack<>();
+        adjacency = new HashMap<>();
 
         Node currentNode = start;
 
         boolean goalFound = currentNode.equals(end);
         boolean searchExhausted = false;
 
-        visited = new BitSet(world.length * world[0].length);
-        Stack<Node> stack = new Stack<>();
-        adjacency = new HashMap<>();
-
         while(!goalFound && !searchExhausted) {
 
             currentNode.updateColor(Color.LIGHTGREEN);
-            try {
-                Thread.sleep(delay);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            markAsVisited(world.length,visited,currentNode);
+            sleep();
+
+            visited.set(getNodeIndex(world.length, currentNode));
             stack.push(currentNode);
             if(!adjacency.containsKey(currentNode)) {
                 adjacency.put(currentNode,getNeighbors(currentNode,world));
             }
 
-            currentNode = getNextNode(world.length, currentNode, stack);
+            currentNode = getNextNode(world.length, currentNode);
 
             goalFound = currentNode != null && currentNode.equals(end);
             searchExhausted = stack.isEmpty();
@@ -45,15 +44,21 @@ public class DFS extends SearchAlgorithm {
 
     }
 
-    private Node getNextNode(int n, Node currentNode, Stack<Node> stack) {
+    private void sleep() {
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Node getNextNode(int worldLength, Node currentNode) {
         Node nextNode = null;
         while(!stack.isEmpty() && nextNode == null) {
             List<Node> neighbors = adjacency.get(currentNode);
             for(Node neighbor : neighbors) {
-                nextNode = neighbor;
-                if (hasBeenVisited(n, visited, nextNode)) {
-                    nextNode = null;
-                } else {
+                if (!visited.get(getNodeIndex(worldLength, neighbor))) {
+                    nextNode = neighbor;
                     break;
                 }
             }
@@ -91,12 +96,8 @@ public class DFS extends SearchAlgorithm {
         return x >= 0 && y >= 0 && x < world.length && y < world[0].length;
     }
 
-    private boolean hasBeenVisited(int n, BitSet visited, Node node) {
-        return visited.get(node.getGridX() * n + node.getGridY());
-    }
-
-    private void markAsVisited(int n, BitSet visited, Node node) {
-        visited.set(node.getGridX() * n + node.getGridY());
+    private int getNodeIndex(int worldLength, Node node) {
+        return node.getGridX() * worldLength + node.getGridY();
     }
 
 }
