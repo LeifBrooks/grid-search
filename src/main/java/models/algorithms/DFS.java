@@ -32,9 +32,7 @@ public class DFS extends SearchAlgorithm {
 
             visited.set(getNodeIndex(world.length, currentNode));
             stack.push(currentNode);
-            if(!adjacency.containsKey(currentNode)) {
-                adjacency.put(currentNode,getNeighbors(currentNode,world));
-            }
+            expandNeighbors(world, currentNode);
 
             currentNode = getNextNode(world.length, currentNode);
 
@@ -44,30 +42,14 @@ public class DFS extends SearchAlgorithm {
 
     }
 
-    private void sleep() {
-        try {
-            Thread.sleep(delay);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    private int getNodeIndex(int worldLength, Node node) {
+        return node.getGridX() * worldLength + node.getGridY();
     }
 
-    private Node getNextNode(int worldLength, Node currentNode) {
-        Node nextNode = null;
-        while(!stack.isEmpty() && nextNode == null) {
-            List<Node> neighbors = adjacency.get(currentNode);
-            for(Node neighbor : neighbors) {
-                if (!visited.get(getNodeIndex(worldLength, neighbor))) {
-                    nextNode = neighbor;
-                    break;
-                }
-            }
-
-            if (nextNode == null) {
-                currentNode = stack.pop();
-            }
+    private void expandNeighbors(Node[][] world, Node currentNode) {
+        if(!adjacency.containsKey(currentNode)) {
+            adjacency.put(currentNode,getNeighbors(currentNode,world));
         }
-        return nextNode;
     }
 
     private List<Node> getNeighbors(Node currentNode, Node[][] world) {
@@ -96,8 +78,22 @@ public class DFS extends SearchAlgorithm {
         return x >= 0 && y >= 0 && x < world.length && y < world[0].length;
     }
 
-    private int getNodeIndex(int worldLength, Node node) {
-        return node.getGridX() * worldLength + node.getGridY();
+    private Node getNextNode(int worldLength, Node currentNode) {
+        Node nextNode = null;
+        while (!stack.isEmpty() && nextNode == null) {
+            List<Node> neighbors = adjacency.get(currentNode);
+            for (Node neighbor : neighbors) {
+                if (!visited.get(getNodeIndex(worldLength, neighbor))) {
+                    nextNode = neighbor;
+                    break;
+                }
+            }
+
+            if (nextNode == null) {
+                currentNode = stack.pop();
+            }
+        }
+        return nextNode;
     }
 
 }

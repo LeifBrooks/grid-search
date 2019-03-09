@@ -60,11 +60,7 @@ public class AStar extends SearchAlgorithm {
             if (isNeighborUpdatable(neighbor, gCost)) {
                 updateNeighbor(neighbor, currentNode, gCost, endNode);
                 neighbor.updateColor(Color.RED);
-                try {
-                    Thread.sleep(delay);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                sleep();
             } else {
                 iter.remove();
             }

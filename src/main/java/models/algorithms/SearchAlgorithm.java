@@ -12,4 +12,12 @@ public abstract class SearchAlgorithm {
         this.delay = delay;
     }
 
+    public void sleep() {
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
