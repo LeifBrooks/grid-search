@@ -5,7 +5,8 @@ import java.util.Map;
 
 public enum Algorithm {
     A_STAR("A*"),
-    DFS("Depth First Search");
+    DFS("Depth First Search"),
+    BFS("Breadth First Search");
 
     private String name;
 

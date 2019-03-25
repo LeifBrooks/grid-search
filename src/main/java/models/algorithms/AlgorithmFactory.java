@@ -8,6 +8,8 @@ public class AlgorithmFactory {
                 return new AStar();
             case DFS:
                 return new DFS();
+            case BFS:
+                return new BFS();
             default:
                 return null;
         }
